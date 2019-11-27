@@ -12,4 +12,6 @@ adb shell uiautomator dump /sdcard/ui.xml
 局限:
 只支持sdk版本16以上的手机
 
+test push
+
  
