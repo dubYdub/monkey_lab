@@ -1,13 +1,8 @@
 # coding=utf-8
-
-from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice, MonkeyImage
 import random
 import time
 import os
 import subprocess
-
-
-device = MonkeyRunner.waitForConnection()
 
 
 class Widget():
@@ -34,6 +29,7 @@ def pickOneApp(fileName):
 
     file = open(fileName, 'r', encoding="utf-8").read()
     filelines = file.split("<")
+    widgets = []
     for line in filelines:
         # pick up the widget
         if (line.find("node") == 0):
@@ -87,34 +83,80 @@ def pickOneApp(fileName):
                 widgets.append(Widget(text, id,  widget_class, x1, y1, x2, y2, 
                 clickable, long_clickable, checkable,focusable, scrollable))
 
-                print(widget_class ,clickable, checkable,focusable, scrollable, x1, x2, y1, y2, numbers)
+                # print(widget_class ,clickable, checkable,focusable, scrollable, x1, x2, y1, y2, numbers)
+
+    return widgets
 
 if __name__ == '__main__':
 
-    # delete the old xml file
-    os.system("adb shell rm /sdcard/today.xml")
-
-    # generate the xml file
-    os.system("adb shell uiautomator dump /sdcard/test.xml")
     
-    # pull the file to PC
-    os.system("adb pull /sdcard/test.xml")
+    for i in range(5):
+        # delete the old xml file
+        os.system("adb shell rm /sdcard/test.xml")
 
-    
-    path = "C:/Users/29551/Desktop/"
-    # path = "C:/android/sdk/tools/bin/"
+        # generate the xml file
+        os.system("adb shell uiautomator dump /sdcard/test.xml")
+        
+        # pull the file to PC
+        os.system("adb pull /sdcard/test.xml")
+        
+        path = "C:/Users/29551/Desktop/monkey_lab/"
+        # path = "C:/android/sdk/tools/bin/"
 
-    xml_file = "today.xml"
+        xml_file = "test.xml"
 
-    widgets = []
+        widgets = []
 
-    # get the widgets' information from the xml file
-    widgets = pickOneApp( path + xml_file )
+        # get the widgets' information from the xml file
+        widgets = pickOneApp( path + xml_file )
 
 
-    # randomly touch a widget
-    index = random.randint(0, len(widgets))
-    x = (widgets[index].x1 + widgets[index].x2)/2
-    y = (widgets[index].y1 + widgets[index].y2)/2
-    device.touch(x, y, "DOWN_AND_UP")
+        # randomly touch a widget
+        index = random.randint(0, len(widgets)-1)
+
+
+        # if clickable 
+        if (widgets[index].clickable == True):
+            x = (widgets[index].x1 + widgets[index].x2)/2
+            y = (widgets[index].y1 + widgets[index].y2)/2
+            os.system("adb shell input tap "+str(x)+" "+str(y))
+            print(str(x)+", "+str(y)+" has been clicked")
+
+        # if scrollable
+        if (widgets[index].scrollable == True):
+            actionIndex = random.randint(1, 4)
+            startX = (widgets[index].x1 + widgets[index].x2)/2
+            startY = (widgets[index].y1 + widgets[index].y2)/2
+            endX = 0
+            endY = 0
+            scrollTime = 500
+
+            # left scroll 
+            if (actionIndex == 1):
+                endX = widgets[index].x1
+                endY = startY 
+                print("left scroll")
+
+            # right scroll
+            elif (actionIndex == 1):
+                endX = widgets[index].x2
+                endY = startY 
+                print("right scroll")
+
+
+            # up scroll
+            elif (actionIndex == 1):
+                endX = startX
+                endY = widgets[index].y1
+                print("up scroll")
+
+
+            # down scroll
+            elif (actionIndex == 1):
+                endX = startX
+                endY = widgets[index].y2
+                print("down scroll")
+
+            os.system("adb shell input swipe "+str(startX)+" "+str(startY)+" "+str(endX)+" "+str(endY)+" "+str(scrollTime))
+
 
