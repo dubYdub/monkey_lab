@@ -100,7 +100,7 @@ if __name__ == '__main__':
         # pull the file to PC
         os.system("adb pull /sdcard/test.xml")
         
-        path = "C:/Users/29551/Desktop/monkey_lab/"
+        path = "./"
         # path = "C:/android/sdk/tools/bin/"
 
         xml_file = "test.xml"
@@ -109,6 +109,8 @@ if __name__ == '__main__':
 
         # get the widgets' information from the xml file
         widgets = pickOneApp( path + xml_file )
+        print(len(widgets))
+
 
 
         # randomly touch a widget
