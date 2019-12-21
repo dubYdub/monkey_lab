@@ -1,5 +1,5 @@
 # monkey_lab
-for nothing
+基于Q-learning的安卓自动化测试工具
 
 ### 项目细节
 
