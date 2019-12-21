@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string msgid="4600421777120114993" name="abc_action_bar_home_description">"Перейти на головний"</string>
+    <string msgid="1594238315039666878" name="abc_action_bar_up_description">"Перейти вгору"</string>
+    <string msgid="3588849162933574182" name="abc_action_menu_overflow_description">"Інші опції"</string>
+    <string msgid="4076576682505996667" name="abc_action_mode_done">"Готово"</string>
+    <string msgid="7468859129482906941" name="abc_activity_chooser_view_see_all">"Переглянути всі"</string>
+    <string msgid="2031811694353399454" name="abc_activitychooserview_choose_application">"Вибрати програму"</string>
+    <string msgid="121134116657445385" name="abc_capital_off">"ВИМК."</string>
+    <string msgid="3405795526292276155" name="abc_capital_on">"УВІМК."</string>
+    <string msgid="7723749260725869598" name="abc_search_hint">"Пошук…"</string>
+    <string msgid="3691816814315814921" name="abc_searchview_description_clear">"Очистити запит"</string>
+    <string msgid="2550479030709304392" name="abc_searchview_description_query">"Пошуковий запит"</string>
+    <string msgid="8264924765203268293" name="abc_searchview_description_search">"Пошук"</string>
+    <string msgid="8928215447528550784" name="abc_searchview_description_submit">"Надіслати запит"</string>
+    <string msgid="893419373245838918" name="abc_searchview_description_voice">"Голосовий пошук"</string>
+    <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"Надіслати через"</string>
+    <string msgid="3300176832234831527" name="abc_shareactionprovider_share_with_application">"Поділитися через додаток <ns1:g id="APPLICATION_NAME">%s</ns1:g>"</string>
+    <string msgid="1603543279005712093" name="abc_toolbar_collapse_description">"Згорнути"</string>
+    <string name="action_about">Про Forecastie</string>
+    <string name="action_graphs">Графіки</string>
+    <string name="action_refresh">Оновити</string>
+    <string name="action_search">Пошук</string>
+    <string name="action_settings">Налаштування</string>
+    <string name="action_weather_map">Погодна карта</string>
+    <string name="app_name">Forecastie</string>
+    <string name="dash_clock_expanded_body">%1$s, %2$s\nВітер: %3$s %4$s\nТиск: %5$s %6$s\nВологість: %7$s %%\n</string>
+    <string name="dash_clock_expanded_title">%1$s°%2$s - %3$s</string>
+    <string name="dash_clock_status">%1$s°%2$s</string>
+    <string name="dialog_cancel">Скасувати</string>
+    <string name="dialog_ok">OK</string>
+    <string name="downloading_data">Завантаження ваших даних ...</string>
+    <string name="error_dateFormat">НЕКОРЕКТНИЙ ФОРМАТ ДАТИ</string>
+    <string name="getting_location">Визначення місця розташування ...</string>
+    <string name="humidity">Вологість</string>
+    <string name="last_update">Востаннє оновлено:\n%s</string>
+    <string name="last_update_widget">\nВостаннє оновлено: %s</string>
+    <string name="later">Пізніше</string>
+    <string name="location_settings">Налаштування місця розташування</string>
+    <string name="location_settings_button">Налаштування</string>
+    <string name="location_settings_message">Визначення місця розташування вимкнено. Бажаєте перейти в меню налаштувань?</string>
+    <string name="msg_city_not_found">Вказане місто не знайдено.</string>
+    <string name="msg_connection_not_available">Підключення недоступне.</string>
+    <string name="msg_connection_problem">Виникла проблема з підключенням до інтернету.</string>
+    <string name="msg_err_parsing_json">Помилка розбору JSON.</string>
+    <string name="msg_too_many_requests">Занадто багато запитів. Спробуйте пізніше.</string>
+    <string name="pressure">Тиск</string>
+    <string name="pressure_unit_hpa">гПа</string>
+    <string name="pressure_unit_kpa">кПа</string>
+    <string name="pressure_unit_mmhg">мм рт.ст.</string>
+    <string name="rain">Дощ</string>
+    <string msgid="146198913615257606" name="search_menu_title">"Пошук"</string>
+    <string name="search_title">Пошук міста</string>
+    <string name="setting_apiKey">Ключ API</string>
+    <string name="setting_apiKey_summary">Власний ключ API для запитів до OpenWeatherMap</string>
+    <string name="setting_auto_detect_location">Визначити місце розташування</string>
+    <string name="setting_dateFormat">Формат дати</string>
+    <string name="setting_dateFormatCustom">Власний формат дати</string>
+    <string name="setting_dateFormatCustom_summary">Задайте власний шаблон в форматі SimpleDateFormat</string>
+    <string name="setting_differentiateDaysByTint">Диференціювати дні за допомогою кольору</string>
+    <string name="setting_displayDecimalZeroes">Показувати десяткові нулі</string>
+    <string name="setting_lengthUnits">Одиниці довжини</string>
+    <string name="setting_pressureUnits">Одиниці тиску</string>
+    <string name="setting_refreshInterval">Інтервал фонового оновлення</string>
+    <string name="setting_showTempAsInteger">Показувати температуру лише як ціле число</string>
+    <string name="setting_speedUnits">Одиниці швидкості</string>
+    <string name="setting_tempUnits">Одиниці температури</string>
+    <string name="setting_theme">Тема</string>
+    <string name="setting_theme_classic">Класична</string>
+    <string name="setting_theme_classic_dark">Класична темна</string>
+    <string name="setting_theme_dark">Нова темна</string>
+    <string name="setting_theme_fresh">Нова</string>
+    <string name="setting_unit_Celsuis">Цельсії</string>
+    <string name="setting_unit_Fahrenheit">Фаренгейти</string>
+    <string name="setting_unit_Kelvin">Кельвіни</string>
+    <string name="setting_unit_hpa">Гектопаскалі (гПа)</string>
+    <string name="setting_unit_in">Дюйми (дюйм)</string>
+    <string name="setting_unit_kpa">Кілопаскалі (кПа)</string>
+    <string name="setting_unit_kph">Кілометри на годину (км/год)</string>
+    <string name="setting_unit_mm">Міліметри (мм)</string>
+    <string name="setting_unit_mmhg">мм ртутного стовпчика (мм рт.ст.)</string>
+    <string name="setting_unit_mph">Миль на годину (миль/год)</string>
+    <string name="setting_unit_mps">Метри за секунду (м/с)</string>
+    <string name="setting_update_location_automatically">Оновлювати місце розташування в фоні</string>
+    <string name="setting_wind_direction_format">Формат напрямку вітру</string>
+    <string name="settings_none">Вимкнено</string>
+    <string name="settings_title_data">Дані</string>
+    <string name="settings_title_display">Відображення</string>
+    <string name="settings_title_location">Місце розташування</string>
+    <string name="settings_title_units">Одиниці</string>
+    <string name="speed_unit_kph">км/год</string>
+    <string name="speed_unit_mph">миль/год</string>
+    <string name="speed_unit_mps">м/с</string>
+    <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
+    <string name="sunrise">Схід сонця</string>
+    <string name="sunset">Захід сонця</string>
+    <string name="temperature">Температура</string>
+    <string name="today">Сьогодні</string>
+    <string name="tomorrow">Завтра</string>
+    <string name="wind">Вітер</string>
+    <string name="wind_direction_east">С</string>
+    <string name="wind_direction_east_north_east">СПнС</string>
+    <string name="wind_direction_east_south_east">СПдС</string>
+    <string name="wind_direction_format_abbreviations">Скорочення</string>
+    <string name="wind_direction_format_arrows">Стрілки</string>
+    <string name="wind_direction_format_none">Не показувати</string>
+    <string name="wind_direction_north">Пн</string>
+    <string name="wind_direction_north_east">ПнС</string>
+    <string name="wind_direction_north_north_east">ПнПнС</string>
+    <string name="wind_direction_north_north_west">ПнПнЗ</string>
+    <string name="wind_direction_north_west">ПнЗ</string>
+    <string name="wind_direction_south">Пд</string>
+    <string name="wind_direction_south_east">ПдС</string>
+    <string name="wind_direction_south_south_east">ПдПдС</string>
+    <string name="wind_direction_south_south_west">ПдПдЗ</string>
+    <string name="wind_direction_south_west">ПдЗ</string>
+    <string name="wind_direction_west">З</string>
+    <string name="wind_direction_west_north_west">ЗПнЗ</string>
+    <string name="wind_direction_west_south_west">ЗПдЗ</string>
+</resources>

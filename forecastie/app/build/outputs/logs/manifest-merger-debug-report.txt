@@ -1,0 +1,301 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:1-119:12
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:1-119:12
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:1-119:12
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:1-119:12
+MERGED from [com.roughike:bottom-bar:1.4.0.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\4fcd17e878756b6f6a34f1e7afa2a943\AndroidManifest.xml:2:1-12:12
+MERGED from [com.android.support:design:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\374a19e38a330a06b62b63d1d3e8ede3\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:appcompat-v7:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\c0c54f4627fbbff120cabc2dec041cc1\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-v4:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\a918cdccd4bace60dfc0084fb51c9cf0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:cardview-v7:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\0660cf3b2ab71268798aa3fef0bf5252\AndroidManifest.xml:17:1-22:12
+MERGED from [com.diogobernardino:williamchart:2.2] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\d7a16f45ecdcc3389731464e7c404f1d\AndroidManifest.xml:2:1-10:12
+MERGED from [com.android.support:recyclerview-v7:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\7975f51b38c15b25b7c2bcb4e0ad6eb0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\3ef1a78a7facdbae80913349b1507525\AndroidManifest.xml:2:1-11:12
+MERGED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:17:1-30:12
+MERGED from [com.android.support:support-fragment:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\96ee308453972e9f109b429a5b32f309\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:animated-vector-drawable:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\c0eb87dd279f347110cb31f82eca901f\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-ui:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\9dd03b469feedcd0cdf4c31b71a1b21e\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-utils:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\6e3c67f1ea0181b8e13219285e3cfd43\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-vector-drawable:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\a78617e6a34003cf77a0e9989d1e0657\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:transition:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\8eae5ed9f01f7838db6aaf44a2fda560\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-media-compat:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\1de94f65532da687130e6ac67ad59952\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-compat:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\2c1f4f65362cd8389f6ad7f38206689b\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:runtime:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\41d80cbe78901e755ebbc3b336df7447\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:livedata:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\c26049d979b7c96fb18ac9cda57829a9\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\71ef18ebd86cc8eca8b0499dd70d3aba\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.core:runtime:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\fcbae08b29b3935a01e98c466e29adb3\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\7242f5611ceab1a2532ccad2a41e86f9\AndroidManifest.xml:17:1-22:12
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:1-119:12
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:1-119:12
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:1-119:12
+	package
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:3:5-37
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:1-119:12
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+	android:versionCode
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:1-119:12
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:5:5-67
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:5:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:6:5-79
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:6:22-76
+uses-permission#android.permission.ACCESS_COARSE_LOCATION
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:7:5-81
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:7:22-78
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:8:5-79
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:8:22-76
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:9:5-81
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:9:22-78
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:10:5-80
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:10:22-78
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:11:5-79
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:11:22-77
+application
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:13:5-110:19
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\3ef1a78a7facdbae80913349b1507525\AndroidManifest.xml:9:5-20
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\3ef1a78a7facdbae80913349b1507525\AndroidManifest.xml:9:5-20
+MERGED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:22:5-28:19
+MERGED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:22:5-28:19
+	android:supportsRtl
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:18:9-35
+	android:label
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:17:9-41
+	android:fullBackupContent
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:15:9-41
+	android:icon
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:16:9-43
+	android:allowBackup
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:14:9-35
+activity#cz.martykan.forecastie.activities.SplashActivity
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:19:9-27:20
+	android:theme
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:21:13-47
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:20:13-54
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:22:13-26:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:23:17-69
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:23:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:25:17-77
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:25:27-74
+activity#cz.martykan.forecastie.activities.MainActivity
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:28:9-31:68
+	android:label
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:30:13-45
+	android:theme
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:31:13-56
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:29:13-52
+activity#cz.martykan.forecastie.activities.SettingsActivity
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:32:9-34:47
+	android:theme
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:34:13-44
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:33:13-56
+receiver#cz.martykan.forecastie.widgets.ExtensiveWidgetProvider
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:36:9-44:20
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:36:19-66
+intent-filter#action:name:android.appwidget.action.APPWIDGET_UPDATE
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:37:13-39:29
+action#android.appwidget.action.APPWIDGET_UPDATE
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:38:17-84
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:38:25-81
+meta-data#android.appwidget.provider
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:41:13-43:60
+	android:resource
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:43:17-57
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:42:17-58
+receiver#cz.martykan.forecastie.widgets.TimeWidgetProvider
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:45:9-53:20
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:45:19-61
+receiver#cz.martykan.forecastie.widgets.SimpleWidgetProvider
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:54:9-62:20
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:54:19-63
+service#cz.martykan.forecastie.widgets.DashClockWeatherExtension
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:64:9-82:19
+	android:label
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:67:13-45
+	android:permission
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:68:13-98
+	android:icon
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:66:13-57
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:65:13-62
+intent-filter#action:name:com.google.android.apps.dashclock.Extension
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:69:13-71:29
+action#com.google.android.apps.dashclock.Extension
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:70:17-86
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:70:25-83
+meta-data#protocolVersion
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:73:13-75:37
+	android:value
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:75:17-34
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:74:17-47
+meta-data#worldReadable
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:76:13-78:40
+	android:value
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:78:17-37
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:77:17-45
+meta-data#settingsActivity
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:79:13-81:60
+	android:value
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:81:17-57
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:80:17-48
+receiver#cz.martykan.forecastie.AlarmReceiver
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:84:9-89:20
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:84:19-48
+intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.net.conn.CONNECTIVITY_CHANGE
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:85:13-88:29
+action#android.intent.action.BOOT_COMPLETED
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:86:17-79
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:86:25-76
+action#android.net.conn.CONNECTIVITY_CHANGE
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:87:17-79
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:87:25-76
+activity#cz.martykan.forecastie.activities.MapActivity
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:91:9-94:59
+	android:parentActivityName
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:93:13-66
+	android:theme
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:94:13-56
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:92:13-51
+activity#cz.martykan.forecastie.activities.GraphActivity
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:96:9-100:59
+	android:parentActivityName
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:99:13-66
+	android:label
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:98:13-50
+	android:theme
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:100:13-56
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:97:13-53
+provider#cz.martykan.forecastie.utils.StubContentProvider
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:102:9-105:39
+	android:authorities
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:104:13-67
+	android:exported
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:105:13-36
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:103:13-76
+activity#cz.martykan.forecastie.test.InstrumentedActivity
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:107:9-108:79
+	android:label
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:107:19-58
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:108:13-76
+instrumentation
+ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:112:5-116:57
+	android:label
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:114:9-48
+	android:handleProfiling
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:113:9-39
+	android:targetPackage
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:116:9-55
+	android:name
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml:115:9-73
+uses-sdk
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+MERGED from [com.roughike:bottom-bar:1.4.0.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\4fcd17e878756b6f6a34f1e7afa2a943\AndroidManifest.xml:8:5-10:41
+MERGED from [com.roughike:bottom-bar:1.4.0.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\4fcd17e878756b6f6a34f1e7afa2a943\AndroidManifest.xml:8:5-10:41
+MERGED from [com.android.support:design:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\374a19e38a330a06b62b63d1d3e8ede3\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:design:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\374a19e38a330a06b62b63d1d3e8ede3\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:appcompat-v7:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\c0c54f4627fbbff120cabc2dec041cc1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:appcompat-v7:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\c0c54f4627fbbff120cabc2dec041cc1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-v4:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\a918cdccd4bace60dfc0084fb51c9cf0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-v4:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\a918cdccd4bace60dfc0084fb51c9cf0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cardview-v7:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\0660cf3b2ab71268798aa3fef0bf5252\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cardview-v7:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\0660cf3b2ab71268798aa3fef0bf5252\AndroidManifest.xml:20:5-44
+MERGED from [com.diogobernardino:williamchart:2.2] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\d7a16f45ecdcc3389731464e7c404f1d\AndroidManifest.xml:6:5-8:41
+MERGED from [com.diogobernardino:williamchart:2.2] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\d7a16f45ecdcc3389731464e7c404f1d\AndroidManifest.xml:6:5-8:41
+MERGED from [com.android.support:recyclerview-v7:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\7975f51b38c15b25b7c2bcb4e0ad6eb0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\7975f51b38c15b25b7c2bcb4e0ad6eb0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\3ef1a78a7facdbae80913349b1507525\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\3ef1a78a7facdbae80913349b1507525\AndroidManifest.xml:5:5-7:41
+MERGED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\96ee308453972e9f109b429a5b32f309\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\96ee308453972e9f109b429a5b32f309\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\c0eb87dd279f347110cb31f82eca901f\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\c0eb87dd279f347110cb31f82eca901f\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\9dd03b469feedcd0cdf4c31b71a1b21e\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\9dd03b469feedcd0cdf4c31b71a1b21e\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\6e3c67f1ea0181b8e13219285e3cfd43\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\6e3c67f1ea0181b8e13219285e3cfd43\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\a78617e6a34003cf77a0e9989d1e0657\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\a78617e6a34003cf77a0e9989d1e0657\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:transition:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\8eae5ed9f01f7838db6aaf44a2fda560\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:transition:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\8eae5ed9f01f7838db6aaf44a2fda560\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-media-compat:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\1de94f65532da687130e6ac67ad59952\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-media-compat:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\1de94f65532da687130e6ac67ad59952\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\2c1f4f65362cd8389f6ad7f38206689b\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:27.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\2c1f4f65362cd8389f6ad7f38206689b\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\41d80cbe78901e755ebbc3b336df7447\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\41d80cbe78901e755ebbc3b336df7447\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\c26049d979b7c96fb18ac9cda57829a9\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\c26049d979b7c96fb18ac9cda57829a9\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\71ef18ebd86cc8eca8b0499dd70d3aba\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\71ef18ebd86cc8eca8b0499dd70d3aba\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\fcbae08b29b3935a01e98c466e29adb3\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\fcbae08b29b3935a01e98c466e29adb3\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\7242f5611ceab1a2532ccad2a41e86f9\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\7242f5611ceab1a2532ccad2a41e86f9\AndroidManifest.xml:20:5-44
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\WZL\CACSE\forecastie\app\src\main\AndroidManifest.xml
+provider#android.arch.lifecycle.ProcessLifecycleOwnerInitializer
+ADDED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:23:9-27:43
+	android:authorities
+		ADDED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:25:13-68
+	android:multiprocess
+		ADDED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:27:13-40
+	android:exported
+		ADDED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:26:13-37
+	android:name
+		ADDED from [android.arch.lifecycle:extensions:1.1.1] C:\Users\WZL\.gradle\caches\transforms-2\files-2.1\10cace997a2281d2ef8b400f27029c2b\AndroidManifest.xml:24:13-83

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GenericRequestTask.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.tasks</a> &gt; <span class="el_source">GenericRequestTask.java</span></div><h1>GenericRequestTask.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.tasks;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Locale;
+
+import cz.martykan.forecastie.Constants;
+import cz.martykan.forecastie.R;
+import cz.martykan.forecastie.activities.MainActivity;
+
+public abstract class GenericRequestTask extends AsyncTask&lt;String, String, TaskOutput&gt; {
+
+    ProgressDialog progressDialog;
+    Context context;
+    MainActivity activity;
+<span class="nc" id="L32">    public int loading = 0;</span>
+
+<span class="nc" id="L34">    public GenericRequestTask(Context context, MainActivity activity, ProgressDialog progressDialog) {</span>
+<span class="nc" id="L35">        this.context = context;</span>
+<span class="nc" id="L36">        this.activity = activity;</span>
+<span class="nc" id="L37">        this.progressDialog = progressDialog;</span>
+<span class="nc" id="L38">    }</span>
+
+    @Override
+    protected void onPreExecute() {
+<span class="nc" id="L42">        incLoadingCounter();</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (!progressDialog.isShowing()) {</span>
+<span class="nc" id="L44">            progressDialog.setMessage(context.getString(R.string.downloading_data));</span>
+<span class="nc" id="L45">            progressDialog.setCanceledOnTouchOutside(false);</span>
+<span class="nc" id="L46">            progressDialog.show();</span>
+        }
+<span class="nc" id="L48">    }</span>
+
+    @Override
+    protected TaskOutput doInBackground(String... params) {
+<span class="nc" id="L52">        TaskOutput output = new TaskOutput();</span>
+
+<span class="nc" id="L54">        String response = &quot;&quot;;</span>
+<span class="nc" id="L55">        String[] reqParams = new String[]{};</span>
+
+<span class="nc bnc" id="L57" title="All 4 branches missed.">        if (params != null &amp;&amp; params.length &gt; 0) {</span>
+<span class="nc" id="L58">            final String zeroParam = params[0];</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">            if (&quot;cachedResponse&quot;.equals(zeroParam)) {</span>
+<span class="nc" id="L60">                response = params[1];</span>
+                // Actually we did nothing in this case :)
+<span class="nc" id="L62">                output.taskResult = TaskResult.SUCCESS;</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">            } else if (&quot;coords&quot;.equals(zeroParam)) {</span>
+<span class="nc" id="L64">                String lat = params[1];</span>
+<span class="nc" id="L65">                String lon = params[2];</span>
+<span class="nc" id="L66">                reqParams = new String[]{&quot;coords&quot;, lat, lon};</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            } else if (&quot;city&quot;.equals(zeroParam)) {</span>
+<span class="nc" id="L68">                reqParams = new String[]{&quot;city&quot;, params[1]};</span>
+            }
+        }
+
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (response.isEmpty()) {</span>
+            try {
+<span class="nc" id="L74">                URL url = provideURL(reqParams);</span>
+<span class="nc" id="L75">                Log.i(&quot;URL&quot;, url.toString());</span>
+<span class="nc" id="L76">                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">                if (urlConnection.getResponseCode() == 200) {</span>
+<span class="nc" id="L78">                    InputStreamReader inputStreamReader = new InputStreamReader(urlConnection.getInputStream());</span>
+<span class="nc" id="L79">                    BufferedReader r = new BufferedReader(inputStreamReader);</span>
+
+<span class="nc" id="L81">                    StringBuilder stringBuilder = new StringBuilder();</span>
+                    String line;
+<span class="nc bnc" id="L83" title="All 2 branches missed.">                    while ((line = r.readLine()) != null) {</span>
+<span class="nc" id="L84">                        stringBuilder.append(line);</span>
+<span class="nc" id="L85">                        stringBuilder.append(&quot;\n&quot;);</span>
+                    }
+<span class="nc" id="L87">                    response += stringBuilder.toString();</span>
+<span class="nc" id="L88">                    close(r);</span>
+<span class="nc" id="L89">                    urlConnection.disconnect();</span>
+                    // Background work finished successfully
+<span class="nc" id="L91">                    Log.i(&quot;Task&quot;, &quot;done successfully&quot;);</span>
+<span class="nc" id="L92">                    output.taskResult = TaskResult.SUCCESS;</span>
+                    // Save date/time for latest successful result
+<span class="nc" id="L94">                    activity.saveLastUpdateTime(PreferenceManager.getDefaultSharedPreferences(context));</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">                } else if (urlConnection.getResponseCode() == 429) {</span>
+                    // Too many requests
+<span class="nc" id="L97">                    Log.i(&quot;Task&quot;, &quot;too many requests&quot;);</span>
+<span class="nc" id="L98">                    output.taskResult = TaskResult.TOO_MANY_REQUESTS;</span>
+                } else {
+                    // Bad response from server
+<span class="nc" id="L101">                    Log.i(&quot;Task&quot;, &quot;bad response &quot; + urlConnection.getResponseCode());</span>
+<span class="nc" id="L102">                    output.taskResult = TaskResult.BAD_RESPONSE;</span>
+                }
+<span class="nc" id="L104">            } catch (IOException e) {</span>
+<span class="nc" id="L105">                Log.e(&quot;IOException Data&quot;, response);</span>
+<span class="nc" id="L106">                e.printStackTrace();</span>
+                // Exception while reading data from url connection
+<span class="nc" id="L108">                output.taskResult = TaskResult.IO_EXCEPTION;</span>
+<span class="nc" id="L109">            }</span>
+        }
+
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (TaskResult.SUCCESS.equals(output.taskResult)) {</span>
+            // Parse JSON data
+<span class="nc" id="L114">            ParseResult parseResult = parseResponse(response);</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">            if (ParseResult.CITY_NOT_FOUND.equals(parseResult)) {</span>
+                // Retain previously specified city if current one was not recognized
+<span class="nc" id="L117">                restorePreviousCity();</span>
+            }
+<span class="nc" id="L119">            output.parseResult = parseResult;</span>
+        }
+
+<span class="nc" id="L122">        return output;</span>
+    }
+
+    @Override
+    protected void onPostExecute(TaskOutput output) {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (loading == 1) {</span>
+<span class="nc" id="L128">            progressDialog.dismiss();</span>
+        }
+<span class="nc" id="L130">        decLoadingCounter();</span>
+
+<span class="nc" id="L132">        updateMainUI();</span>
+
+<span class="nc" id="L134">        handleTaskOutput(output);</span>
+<span class="nc" id="L135">    }</span>
+
+    protected final void handleTaskOutput(TaskOutput output) {
+<span class="nc bnc" id="L138" title="All 5 branches missed.">        switch (output.taskResult) {</span>
+            case SUCCESS: {
+<span class="nc" id="L140">                ParseResult parseResult = output.parseResult;</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">                if (ParseResult.CITY_NOT_FOUND.equals(parseResult)) {</span>
+<span class="nc" id="L142">                    Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.msg_city_not_found), Snackbar.LENGTH_LONG).show();</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">                } else if (ParseResult.JSON_EXCEPTION.equals(parseResult)) {</span>
+<span class="nc" id="L144">                    Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.msg_err_parsing_json), Snackbar.LENGTH_LONG).show();</span>
+                }
+                break;
+            }
+            case TOO_MANY_REQUESTS: {
+<span class="nc" id="L149">                Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.msg_too_many_requests), Snackbar.LENGTH_LONG).show();</span>
+<span class="nc" id="L150">                break;</span>
+            }
+            case BAD_RESPONSE: {
+<span class="nc" id="L153">                Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.msg_connection_problem), Snackbar.LENGTH_LONG).show();</span>
+<span class="nc" id="L154">                break;</span>
+            }
+            case IO_EXCEPTION: {
+<span class="nc" id="L157">                Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.msg_connection_not_available), Snackbar.LENGTH_LONG).show();</span>
+                break;
+            }
+        }
+<span class="nc" id="L161">    }</span>
+
+    private String getLanguage() {
+<span class="nc" id="L164">        String language = Locale.getDefault().getLanguage();</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        if (language.equals(&quot;cs&quot;)) {</span>
+<span class="nc" id="L166">            language = &quot;cz&quot;;</span>
+        }
+<span class="nc" id="L168">        return language;</span>
+    }
+
+    private URL provideURL(String[] reqParams) throws UnsupportedEncodingException, MalformedURLException {
+<span class="nc" id="L172">        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);</span>
+<span class="nc" id="L173">        String apiKey = sp.getString(&quot;apiKey&quot;, activity.getResources().getString(R.string.apiKey));</span>
+
+<span class="nc" id="L175">        StringBuilder urlBuilder = new StringBuilder(&quot;https://api.openweathermap.org/data/2.5/&quot;);</span>
+<span class="nc" id="L176">        urlBuilder.append(getAPIName()).append(&quot;?&quot;);</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        if (reqParams.length &gt; 0) {</span>
+<span class="nc" id="L178">            final String zeroParam = reqParams[0];</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">            if (&quot;coords&quot;.equals(zeroParam)) {</span>
+<span class="nc" id="L180">                urlBuilder.append(&quot;lat=&quot;).append(reqParams[1]).append(&quot;&amp;lon=&quot;).append(reqParams[2]);</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">            } else if (&quot;city&quot;.equals(zeroParam)) {</span>
+<span class="nc" id="L182">                urlBuilder.append(&quot;q=&quot;).append(reqParams[1]);</span>
+            }
+<span class="nc" id="L184">        } else {</span>
+<span class="nc" id="L185">            final String cityId = sp.getString(&quot;cityId&quot;, Constants.DEFAULT_CITY_ID);</span>
+<span class="nc" id="L186">            urlBuilder.append(&quot;id=&quot;).append(URLEncoder.encode(cityId, &quot;UTF-8&quot;));</span>
+        }
+<span class="nc" id="L188">        urlBuilder.append(&quot;&amp;lang=&quot;).append(getLanguage());</span>
+<span class="nc" id="L189">        urlBuilder.append(&quot;&amp;mode=json&quot;);</span>
+<span class="nc" id="L190">        urlBuilder.append(&quot;&amp;appid=&quot;).append(apiKey);</span>
+
+<span class="nc" id="L192">        return new URL(urlBuilder.toString());</span>
+    }
+
+    private void restorePreviousCity() {
+<span class="nc bnc" id="L196" title="All 2 branches missed.">        if (!TextUtils.isEmpty(activity.recentCityId)) {</span>
+<span class="nc" id="L197">            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();</span>
+<span class="nc" id="L198">            editor.putString(&quot;cityId&quot;, activity.recentCityId);</span>
+<span class="nc" id="L199">            editor.commit();</span>
+<span class="nc" id="L200">            activity.recentCityId = &quot;&quot;;</span>
+        }
+<span class="nc" id="L202">    }</span>
+
+    private static void close(Closeable x) {
+        try {
+<span class="nc bnc" id="L206" title="All 2 branches missed.">            if (x != null) {</span>
+<span class="nc" id="L207">                x.close();</span>
+            }
+<span class="nc" id="L209">        } catch (IOException e) {</span>
+<span class="nc" id="L210">            Log.e(&quot;IOException Data&quot;, &quot;Error occurred while closing stream&quot;);</span>
+<span class="nc" id="L211">        }</span>
+<span class="nc" id="L212">    }</span>
+
+    private void incLoadingCounter() {
+<span class="nc" id="L215">        loading++;</span>
+<span class="nc" id="L216">    }</span>
+
+    private void decLoadingCounter() {
+<span class="nc" id="L219">        loading--;</span>
+<span class="nc" id="L220">    }</span>
+
+    protected void updateMainUI() {
+<span class="nc" id="L223">    }</span>
+
+    protected abstract ParseResult parseResponse(String response);
+
+    protected abstract String getAPIName();
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.4.1</div></body></html>

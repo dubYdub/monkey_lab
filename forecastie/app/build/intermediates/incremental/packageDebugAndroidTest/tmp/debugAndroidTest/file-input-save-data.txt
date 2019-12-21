@@ -1,0 +1,7 @@
+#Internal package file, do not edit.
+#Sat Dec 21 15:12:00 CST 2019
+0.baseType=DIRECTORY
+0.base=C\:\\Users\\WZL\\CACSE\\forecastie\\app\\build\\intermediates\\dex\\debugAndroidTest\\mergeDexDebugAndroidTest\\out
+0.path=classes.dex
+0.set=DEX
+count=1

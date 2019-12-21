@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Formatting.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.utils</a> &gt; <span class="el_source">Formatting.java</span></div><h1>Formatting.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.utils;
+
+import android.content.Context;
+
+import cz.martykan.forecastie.R;
+
+public class Formatting {
+
+    private Context context;
+
+<span class="fc" id="L11">    public Formatting(Context context) {</span>
+<span class="fc" id="L12">        this.context = context;</span>
+<span class="fc" id="L13">    }</span>
+
+    public String setWeatherIcon(int actualId, boolean day) {
+<span class="fc" id="L16">        int id = actualId / 100;</span>
+<span class="fc" id="L17">        String icon = &quot;&quot;;</span>
+
+<span class="pc bpc" id="L19" title="1 of 2 branches missed.">        if (id == 2) {</span>
+            // thunderstorm
+<span class="nc bnc" id="L21" title="All 2 branches missed.">            switch (actualId) {</span>
+                case 210:
+                case 211:
+                case 212:
+                case 221:
+<span class="nc" id="L26">                    icon = context.getString(R.string.weather_lightning);</span>
+<span class="nc" id="L27">                    break;</span>
+                case 200:
+                case 201:
+                case 202:
+                case 230:
+                case 231:
+                case 232:
+                default:
+<span class="nc" id="L35">                    icon = context.getString(R.string.weather_thunderstorm);</span>
+<span class="nc" id="L36">                    break;</span>
+            }
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        } else if (id == 3) {</span>
+            // drizzle/sprinkle
+<span class="nc bnc" id="L40" title="All 4 branches missed.">            switch (actualId) {</span>
+                case 302:
+                case 311:
+                case 312:
+                case 314:
+<span class="nc" id="L45">                    icon = context.getString(R.string.weather_rain);</span>
+<span class="nc" id="L46">                    break;</span>
+                case 310:
+<span class="nc" id="L48">                    icon = context.getString(R.string.weather_rain_mix);</span>
+<span class="nc" id="L49">                    break;</span>
+                case 313:
+<span class="nc" id="L51">                    icon = context.getString(R.string.weather_showers);</span>
+<span class="nc" id="L52">                    break;</span>
+                case 300:
+                case 301:
+                case 321:
+                default:
+<span class="nc" id="L57">                    icon = context.getString(R.string.weather_sprinkle);</span>
+<span class="nc" id="L58">                    break;</span>
+            }
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        } else if (id == 5) {</span>
+            // rain
+<span class="pc bpc" id="L62" title="3 of 5 branches missed.">            switch (actualId) {</span>
+                case 500:
+<span class="fc" id="L64">                    icon = context.getString(R.string.weather_sprinkle);</span>
+<span class="fc" id="L65">                    break;</span>
+                case 511:
+<span class="nc" id="L67">                    icon = context.getString(R.string.weather_rain_mix);</span>
+<span class="nc" id="L68">                    break;</span>
+                case 520:
+                case 521:
+                case 522:
+<span class="nc" id="L72">                    icon = context.getString(R.string.weather_showers);</span>
+<span class="nc" id="L73">                    break;</span>
+                case 531:
+<span class="nc" id="L75">                    icon = context.getString(R.string.weather_storm_showers);</span>
+<span class="nc" id="L76">                    break;</span>
+                case 501:
+                case 502:
+                case 503:
+                case 504:
+                default:
+<span class="fc" id="L82">                    icon = context.getString(R.string.weather_rain);</span>
+<span class="fc" id="L83">                    break;</span>
+            }
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        } else if (id == 6) {</span>
+            // snow
+<span class="nc bnc" id="L87" title="All 3 branches missed.">            switch (actualId) {</span>
+                case 611:
+<span class="nc" id="L89">                    icon = context.getString(R.string.weather_sleet);</span>
+<span class="nc" id="L90">                    break;</span>
+                case 612:
+                case 613:
+                case 615:
+                case 616:
+                case 620:
+<span class="nc" id="L96">                    icon = context.getString(R.string.weather_rain_mix);</span>
+<span class="nc" id="L97">                    break;</span>
+                case 600:
+                case 601:
+                case 602:
+                case 621:
+                case 622:
+                default:
+<span class="nc" id="L104">                    icon = context.getString(R.string.weather_snow);</span>
+<span class="nc" id="L105">                    break;</span>
+            }
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        } else if (id == 7) {</span>
+            // atmosphere
+<span class="nc bnc" id="L109" title="All 7 branches missed.">            switch (actualId) {</span>
+                case 711:
+<span class="nc" id="L111">                    icon = context.getString(R.string.weather_smoke);</span>
+<span class="nc" id="L112">                    break;</span>
+                case 721:
+<span class="nc" id="L114">                    icon = context.getString(R.string.weather_day_haze);</span>
+<span class="nc" id="L115">                    break;</span>
+                case 731:
+                case 761:
+                case 762:
+<span class="nc" id="L119">                    icon = context.getString(R.string.weather_dust);</span>
+<span class="nc" id="L120">                    break;</span>
+                case 751:
+<span class="nc" id="L122">                    icon = context.getString(R.string.weather_sandstorm);</span>
+<span class="nc" id="L123">                    break;</span>
+                case 771:
+<span class="nc" id="L125">                    icon = context.getString(R.string.weather_cloudy_gusts);</span>
+<span class="nc" id="L126">                    break;</span>
+                case 781:
+<span class="nc" id="L128">                    icon = context.getString(R.string.weather_tornado);</span>
+<span class="nc" id="L129">                    break;</span>
+                case 701:
+                case 741:
+                default:
+<span class="nc" id="L133">                    icon = context.getString(R.string.weather_fog);</span>
+<span class="nc" id="L134">                    break;</span>
+            }
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        } else if (id == 8) {</span>
+            // clear sky or cloudy
+<span class="fc bfc" id="L138" title="All 3 branches covered.">            switch (actualId) {</span>
+                case 800:
+<span class="fc bfc" id="L140" title="All 2 branches covered.">                    icon = day ? context.getString(R.string.weather_day_sunny) : context.getString(R.string.weather_night_clear);</span>
+<span class="fc" id="L141">                    break;</span>
+                case 801:
+                case 802:
+<span class="fc bfc" id="L144" title="All 2 branches covered.">                    icon = day ? context.getString(R.string.weather_day_cloudy) : context.getString(R.string.weather_night_alt_cloudy);</span>
+<span class="fc" id="L145">                    break;</span>
+                case 803:
+                case 804:
+                default:
+<span class="fc" id="L149">                    icon = context.getString(R.string.weather_cloudy);</span>
+<span class="fc" id="L150">                    break;</span>
+            }
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        } else if (id == 9) {</span>
+<span class="nc bnc" id="L153" title="All 8 branches missed.">            switch (actualId) {</span>
+                case 900:
+<span class="nc" id="L155">                    icon = context.getString(R.string.weather_tornado);</span>
+<span class="nc" id="L156">                    break;</span>
+                case 901:
+<span class="nc" id="L158">                    icon = context.getString(R.string.weather_storm_showers);</span>
+<span class="nc" id="L159">                    break;</span>
+                case 902:
+<span class="nc" id="L161">                    icon = context.getString(R.string.weather_hurricane);</span>
+<span class="nc" id="L162">                    break;</span>
+                case 903:
+<span class="nc" id="L164">                    icon = context.getString(R.string.weather_snowflake_cold);</span>
+<span class="nc" id="L165">                    break;</span>
+                case 904:
+<span class="nc" id="L167">                    icon = context.getString(R.string.weather_hot);</span>
+<span class="nc" id="L168">                    break;</span>
+                case 905:
+<span class="nc" id="L170">                    icon = context.getString(R.string.weather_windy);</span>
+<span class="nc" id="L171">                    break;</span>
+                case 906:
+<span class="nc" id="L173">                    icon = context.getString(R.string.weather_hail);</span>
+<span class="nc" id="L174">                    break;</span>
+                case 957:
+                default:
+<span class="nc" id="L177">                    icon = context.getString(R.string.weather_strong_wind);</span>
+                    break;
+            }
+        }
+
+<span class="fc" id="L182">        return icon;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

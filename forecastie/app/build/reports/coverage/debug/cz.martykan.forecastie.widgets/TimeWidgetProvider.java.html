@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TimeWidgetProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.widgets</a> &gt; <span class="el_source">TimeWidgetProvider.java</span></div><h1>TimeWidgetProvider.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.widgets;
+
+import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import android.widget.RemoteViews;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import cz.martykan.forecastie.AlarmReceiver;
+import cz.martykan.forecastie.R;
+import cz.martykan.forecastie.activities.MainActivity;
+import cz.martykan.forecastie.models.Weather;
+
+<span class="nc" id="L21">public class TimeWidgetProvider extends AbstractWidgetProvider {</span>
+    @Override
+    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+<span class="nc bnc" id="L24" title="All 2 branches missed.">        for (int widgetId : appWidgetIds) {</span>
+<span class="nc" id="L25">            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),</span>
+                    R.layout.time_widget);
+
+<span class="nc" id="L28">            setTheme(context, remoteViews);</span>
+
+<span class="nc" id="L30">            Intent intent = new Intent(context, AlarmReceiver.class);</span>
+<span class="nc" id="L31">            PendingIntent pendingIntent = PendingIntent.getBroadcast(context,</span>
+                    0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+<span class="nc" id="L33">            remoteViews.setOnClickPendingIntent(R.id.widgetButtonRefresh, pendingIntent);</span>
+
+<span class="nc" id="L35">            Intent intent2 = new Intent(context, MainActivity.class);</span>
+<span class="nc" id="L36">            PendingIntent pendingIntent2 = PendingIntent.getActivity(context, 0, intent2, 0);</span>
+<span class="nc" id="L37">            remoteViews.setOnClickPendingIntent(R.id.widgetRoot, pendingIntent2);</span>
+
+<span class="nc" id="L39">            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);</span>
+<span class="nc" id="L40">            Weather widgetWeather = new Weather();</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">            if(!sp.getString(&quot;lastToday&quot;, &quot;&quot;).equals(&quot;&quot;)) {</span>
+<span class="nc" id="L42">                widgetWeather = parseWidgetJson(sp.getString(&quot;lastToday&quot;, &quot;&quot;), context);</span>
+            }
+            else {
+                try {
+<span class="nc" id="L46">                    pendingIntent2.send();</span>
+<span class="nc" id="L47">                } catch (PendingIntent.CanceledException e) {</span>
+<span class="nc" id="L48">                    e.printStackTrace();</span>
+<span class="nc" id="L49">                }</span>
+<span class="nc" id="L50">                return;</span>
+            }
+
+<span class="nc" id="L53">            DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);</span>
+<span class="nc" id="L54">            String defaultDateFormat = context.getResources().getStringArray(R.array.dateFormatsValues)[0];</span>
+<span class="nc" id="L55">            String simpleDateFormat = sp.getString(&quot;dateFormat&quot;, defaultDateFormat);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">            if (&quot;custom&quot;.equals(simpleDateFormat)) {</span>
+<span class="nc" id="L57">                simpleDateFormat = sp.getString(&quot;dateFormatCustom&quot;, defaultDateFormat);</span>
+            }
+            String dateString;
+            try {
+<span class="nc" id="L61">                simpleDateFormat = simpleDateFormat.substring(0, simpleDateFormat.indexOf(&quot;-&quot;) - 1);</span>
+                try {
+<span class="nc" id="L63">                    SimpleDateFormat resultFormat = new SimpleDateFormat(simpleDateFormat);</span>
+<span class="nc" id="L64">                    dateString = resultFormat.format(new Date());</span>
+<span class="nc" id="L65">                } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L66">                    dateString = context.getResources().getString(R.string.error_dateFormat);</span>
+<span class="nc" id="L67">                }</span>
+<span class="nc" id="L68">            } catch (StringIndexOutOfBoundsException e) {</span>
+<span class="nc" id="L69">                DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);</span>
+<span class="nc" id="L70">                dateString = dateFormat.format(new Date());</span>
+<span class="nc" id="L71">            }</span>
+
+<span class="nc" id="L73">            remoteViews.setTextViewText(R.id.time, timeFormat.format(new Date()));</span>
+<span class="nc" id="L74">            remoteViews.setTextViewText(R.id.date, dateString);</span>
+<span class="nc" id="L75">            remoteViews.setTextViewText(R.id.widgetCity, widgetWeather.getCity() + &quot;, &quot; + widgetWeather.getCountry());</span>
+<span class="nc" id="L76">            remoteViews.setTextViewText(R.id.widgetTemperature, widgetWeather.getTemperature());</span>
+<span class="nc" id="L77">            remoteViews.setTextViewText(R.id.widgetDescription, widgetWeather.getDescription());</span>
+<span class="nc" id="L78">            remoteViews.setImageViewBitmap(R.id.widgetIcon, getWeatherIcon(widgetWeather.getIcon(), context));</span>
+
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            if (android.os.Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.JELLY_BEAN)</span>
+            {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">                if (dateString.length() &gt; 19)</span>
+<span class="nc" id="L83">                    remoteViews.setViewPadding(R.id.widgetIcon, 40, 0, 0, 0);</span>
+            }
+
+<span class="nc" id="L86">            appWidgetManager.updateAppWidget(widgetId, remoteViews);</span>
+        }
+<span class="nc" id="L88">        scheduleNextUpdate(context);</span>
+<span class="nc" id="L89">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.4.1</div></body></html>

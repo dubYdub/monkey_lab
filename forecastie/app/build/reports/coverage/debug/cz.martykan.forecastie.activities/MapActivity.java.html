@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.activities</a> &gt; <span class="el_source">MapActivity.java</span></div><h1>MapActivity.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.activities;
+
+import android.annotation.SuppressLint;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.IdRes;
+import android.util.Log;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnMenuTabClickListener;
+
+import cz.martykan.forecastie.R;
+import cz.martykan.forecastie.viewmodels.MapViewModel;
+
+<span class="nc" id="L20">public class MapActivity extends BaseActivity {</span>
+
+    private BottomBar bottomBar;
+    private WebView webView;
+    private MapViewModel mapViewModel;
+
+    @SuppressLint({&quot;SetJavaScriptEnabled&quot;, &quot;AddJavascriptInterface&quot;})
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+<span class="nc" id="L29">        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);</span>
+<span class="nc" id="L30">        super.onCreate(savedInstanceState);</span>
+<span class="nc" id="L31">        setContentView(R.layout.activity_map);</span>
+
+<span class="nc" id="L33">        mapViewModel = ViewModelProviders.of(this).get(MapViewModel.class);</span>
+
+<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (savedInstanceState == null) {</span>
+<span class="nc" id="L36">            mapViewModel.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);</span>
+<span class="nc" id="L37">            mapViewModel.mapLat = prefs.getFloat(&quot;latitude&quot;, 0);</span>
+<span class="nc" id="L38">            mapViewModel.mapLon = prefs.getFloat(&quot;longitude&quot;, 0);</span>
+<span class="nc" id="L39">            mapViewModel.apiKey = mapViewModel.sharedPreferences.getString(&quot;apiKey&quot;, getResources().getString(R.string.apiKey));</span>
+        }
+
+<span class="nc" id="L42">        webView = findViewById(R.id.webView);</span>
+<span class="nc" id="L43">        webView.getSettings().setJavaScriptEnabled(true);</span>
+<span class="nc" id="L44">        webView.loadUrl(&quot;file:///android_asset/map.html?lat=&quot; + mapViewModel.mapLat + &quot;&amp;lon=&quot;</span>
+                + mapViewModel.mapLon + &quot;&amp;appid=&quot; + mapViewModel.apiKey
+                + &quot;&amp;zoom=&quot; + mapViewModel.mapZoom);
+<span class="nc" id="L47">        webView.addJavascriptInterface(new HybridInterface(), &quot;NativeInterface&quot;);</span>
+<span class="nc" id="L48">        webView.setWebViewClient(new WebViewClient() {</span>
+            @Override
+            public void onPageFinished(WebView view, String url) {
+<span class="nc" id="L51">                super.onPageFinished(view, url);</span>
+
+<span class="nc bnc" id="L53" title="All 2 branches missed.">                if (savedInstanceState != null) {</span>
+<span class="nc" id="L54">                    setMapState(mapViewModel.tabPosition);</span>
+                }
+<span class="nc" id="L56">            }</span>
+        });
+
+<span class="nc" id="L59">        bottomBar = BottomBar.attach(this, savedInstanceState);</span>
+<span class="nc" id="L60">        bottomBar.setItems(R.menu.menu_map_bottom);</span>
+<span class="nc" id="L61">        bottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {</span>
+            @Override
+            public void onMenuTabSelected(@IdRes int menuItemId) {
+<span class="nc" id="L64">                setMapState(menuItemId);</span>
+<span class="nc" id="L65">                mapViewModel.tabPosition = menuItemId;</span>
+<span class="nc" id="L66">            }</span>
+
+            @Override
+            public void onMenuTabReSelected(@IdRes int menuItemId) {
+<span class="nc" id="L70">            }</span>
+        });
+<span class="nc" id="L72">    }</span>
+
+    private void setMapState(int item) {
+<span class="nc bnc" id="L75" title="All 4 branches missed.">        switch (item) {</span>
+            case R.id.map_rain:
+<span class="nc" id="L77">                webView.loadUrl(&quot;javascript:map.removeLayer(windLayer);map.removeLayer(tempLayer);&quot;</span>
+                        + &quot;map.addLayer(rainLayer);&quot;);
+<span class="nc" id="L79">                break;</span>
+            case R.id.map_wind:
+<span class="nc" id="L81">                webView.loadUrl(&quot;javascript:map.removeLayer(rainLayer);map.removeLayer(tempLayer);&quot;</span>
+                        + &quot;map.addLayer(windLayer);&quot;);
+<span class="nc" id="L83">                break;</span>
+            case R.id.map_temperature:
+<span class="nc" id="L85">                webView.loadUrl(&quot;javascript:map.removeLayer(windLayer);map.removeLayer(rainLayer);&quot;</span>
+                        + &quot;map.addLayer(tempLayer);&quot;);
+<span class="nc" id="L87">                break;</span>
+            default:
+<span class="nc" id="L89">                Log.w(&quot;WeatherMap&quot;, &quot;Layer not configured&quot;);</span>
+                break;
+        }
+<span class="nc" id="L92">    }</span>
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+<span class="nc" id="L96">        super.onSaveInstanceState(outState);</span>
+<span class="nc" id="L97">        bottomBar.onSaveInstanceState(outState);</span>
+<span class="nc" id="L98">    }</span>
+
+<span class="nc" id="L100">    private class HybridInterface {</span>
+
+        @JavascriptInterface
+        public void transferLatLon(double lat, double lon) {
+<span class="nc" id="L104">            mapViewModel.mapLat = lat;</span>
+<span class="nc" id="L105">            mapViewModel.mapLon = lon;</span>
+<span class="nc" id="L106">        }</span>
+
+        @JavascriptInterface
+        public void transferZoom(int level) {
+<span class="nc" id="L110">            mapViewModel.mapZoom = level;</span>
+<span class="nc" id="L111">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.4.1</div></body></html>

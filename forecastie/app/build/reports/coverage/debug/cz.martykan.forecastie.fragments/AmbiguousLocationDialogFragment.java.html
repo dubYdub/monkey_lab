@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AmbiguousLocationDialogFragment.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.fragments</a> &gt; <span class="el_source">AmbiguousLocationDialogFragment.java</span></div><h1>AmbiguousLocationDialogFragment.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.fragments;
+
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import cz.martykan.forecastie.R;
+import cz.martykan.forecastie.activities.MainActivity;
+import cz.martykan.forecastie.adapters.LocationsRecyclerAdapter;
+import cz.martykan.forecastie.models.Weather;
+import cz.martykan.forecastie.utils.Formatting;
+import cz.martykan.forecastie.utils.UnitConvertor;
+
+import static cz.martykan.forecastie.utils.TimeUtils.isDayTime;
+
+<span class="nc" id="L38">public class AmbiguousLocationDialogFragment extends DialogFragment implements LocationsRecyclerAdapter.ItemClickListener {</span>
+
+    private LocationsRecyclerAdapter recyclerAdapter;
+    private SharedPreferences sharedPreferences;
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+<span class="nc" id="L46">        return inflater.inflate(R.layout.fragment_dialog_ambiguous_location, container, false);</span>
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+<span class="nc" id="L51">        super.onViewCreated(view, savedInstanceState);</span>
+
+<span class="nc" id="L53">        final Formatting formatting = new Formatting(getActivity());</span>
+<span class="nc" id="L54">        final Bundle bundle = getArguments();</span>
+<span class="nc" id="L55">        final Toolbar toolbar = view.findViewById(R.id.dialogToolbar);</span>
+<span class="nc" id="L56">        final RecyclerView recyclerView = view.findViewById(R.id.locationsRecyclerView);</span>
+<span class="nc" id="L57">        final LinearLayout linearLayout = view.findViewById(R.id.locationsLinearLayout);</span>
+
+<span class="nc" id="L59">        toolbar.setTitle(&quot;Locations&quot;);</span>
+
+<span class="nc" id="L61">        toolbar.setNavigationIcon(R.drawable.ic_close_black_24dp);</span>
+<span class="nc" id="L62">        toolbar.setNavigationOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View view) {
+<span class="nc" id="L65">                getActivity().getSupportFragmentManager().popBackStack();</span>
+<span class="nc" id="L66">            }</span>
+        });
+
+<span class="nc" id="L69">        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());</span>
+
+<span class="nc" id="L71">        final int theme = getTheme(sharedPreferences.getString(&quot;theme&quot;, &quot;fresh&quot;));</span>
+<span class="nc bnc" id="L72" title="All 4 branches missed.">        final boolean darkTheme = theme == R.style.AppTheme_NoActionBar_Dark ||</span>
+                theme == R.style.AppTheme_NoActionBar_Classic_Dark;
+<span class="nc bnc" id="L74" title="All 4 branches missed.">        final boolean blackTheme = theme == R.style.AppTheme_NoActionBar_Black ||</span>
+                theme == R.style.AppTheme_NoActionBar_Classic_Black;
+
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (darkTheme) {</span>
+<span class="nc" id="L78">            linearLayout.setBackgroundColor(Color.parseColor(&quot;#2f2f2f&quot;));</span>
+        }
+
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (blackTheme) {</span>
+<span class="nc" id="L82">            linearLayout.setBackgroundColor(Color.BLACK);</span>
+        }
+
+        try {
+<span class="nc" id="L86">            final JSONArray cityListArray = new JSONArray(bundle.getString(&quot;cityList&quot;));</span>
+<span class="nc" id="L87">            final ArrayList&lt;Weather&gt; weatherArrayList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L88">            recyclerAdapter =</span>
+<span class="nc" id="L89">                    new LocationsRecyclerAdapter(getActivity().getApplicationContext(), weatherArrayList, darkTheme, blackTheme);</span>
+
+<span class="nc" id="L91">            recyclerAdapter.setClickListener(AmbiguousLocationDialogFragment.this);</span>
+
+<span class="nc bnc" id="L93" title="All 2 branches missed.">            for (int i = 0; i &lt; cityListArray.length(); i++) {</span>
+<span class="nc" id="L94">                final JSONObject cityObject = cityListArray.getJSONObject(i);</span>
+<span class="nc" id="L95">                final JSONObject weatherObject = cityObject.getJSONArray(&quot;weather&quot;).getJSONObject(0);</span>
+<span class="nc" id="L96">                final JSONObject mainObject = cityObject.getJSONObject(&quot;main&quot;);</span>
+<span class="nc" id="L97">                final JSONObject coordObject = cityObject.getJSONObject(&quot;coord&quot;);</span>
+<span class="nc" id="L98">                final JSONObject sysObject = cityObject.getJSONObject(&quot;sys&quot;);</span>
+
+<span class="nc" id="L100">                final Calendar calendar = Calendar.getInstance();</span>
+<span class="nc" id="L101">                final String dateMsString = cityObject.getString(&quot;dt&quot;) + &quot;000&quot;;</span>
+<span class="nc" id="L102">                final String city = cityObject.getString(&quot;name&quot;);</span>
+<span class="nc" id="L103">                final String country = sysObject.getString(&quot;country&quot;);</span>
+<span class="nc" id="L104">                final String cityId = cityObject.getString(&quot;id&quot;);</span>
+<span class="nc" id="L105">                final String description = weatherObject.getString(&quot;description&quot;);</span>
+<span class="nc" id="L106">                final String weatherId = weatherObject.getString(&quot;id&quot;);</span>
+<span class="nc" id="L107">                final float temperature = UnitConvertor.convertTemperature(Float.parseFloat(mainObject.getString(&quot;temp&quot;)), sharedPreferences);</span>
+<span class="nc" id="L108">                final double lat = coordObject.getDouble(&quot;lat&quot;);</span>
+<span class="nc" id="L109">                final double lon = coordObject.getDouble(&quot;lon&quot;);</span>
+
+<span class="nc" id="L111">                calendar.setTimeInMillis(Long.parseLong(dateMsString));</span>
+
+<span class="nc" id="L113">                Weather weather = new Weather();</span>
+<span class="nc" id="L114">                weather.setCity(city);</span>
+<span class="nc" id="L115">                weather.setCountry(country);</span>
+<span class="nc" id="L116">                weather.setId(cityId);</span>
+<span class="nc" id="L117">                weather.setDescription(description.substring(0, 1).toUpperCase() + description.substring(1));</span>
+<span class="nc" id="L118">                weather.setLat(lat);</span>
+<span class="nc" id="L119">                weather.setLon(lon);</span>
+<span class="nc" id="L120">                weather.setIcon(formatting.setWeatherIcon(Integer.parseInt(weatherId), isDayTime(weather, calendar)));</span>
+
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                if (sharedPreferences.getBoolean(&quot;displayDecimalZeroes&quot;, false)) {</span>
+<span class="nc" id="L123">                    weather.setTemperature(new DecimalFormat(&quot;0.0&quot;).format(temperature) + &quot; &quot; + sharedPreferences.getString(&quot;unit&quot;, &quot;°C&quot;));</span>
+                } else {
+<span class="nc" id="L125">                    weather.setTemperature(new DecimalFormat(&quot;#.#&quot;).format(temperature) + &quot; &quot; + sharedPreferences.getString(&quot;unit&quot;, &quot;°C&quot;));</span>
+                }
+
+<span class="nc" id="L128">                weatherArrayList.add(weather);</span>
+            }
+
+<span class="nc" id="L131">            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));</span>
+<span class="nc" id="L132">            recyclerView.setAdapter(recyclerAdapter);</span>
+
+
+<span class="nc" id="L135">        } catch (JSONException e) {</span>
+<span class="nc" id="L136">            e.printStackTrace();</span>
+<span class="nc" id="L137">        }</span>
+<span class="nc" id="L138">    }</span>
+
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+<span class="nc" id="L144">        return super.onCreateDialog(savedInstanceState);</span>
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+<span class="nc" id="L149">        super.onCreate(savedInstanceState);</span>
+<span class="nc" id="L150">    }</span>
+
+    @SuppressLint(&quot;ApplySharedPref&quot;)
+    @Override
+    public void onItemClickListener(View view, int position) {
+<span class="nc" id="L155">        final Weather weather = recyclerAdapter.getItem(position);</span>
+<span class="nc" id="L156">        final Intent intent = new Intent(getActivity(), MainActivity.class);</span>
+<span class="nc" id="L157">        final Bundle bundle = new Bundle();</span>
+
+<span class="nc" id="L159">        sharedPreferences.edit().putString(&quot;cityId&quot;, weather.getId()).commit();</span>
+<span class="nc" id="L160">        bundle.putBoolean(&quot;shouldRefresh&quot;, true);</span>
+<span class="nc" id="L161">        intent.putExtras(bundle);</span>
+
+<span class="nc" id="L163">        startActivity(intent);</span>
+<span class="nc" id="L164">    }</span>
+
+    private int getTheme(String themePref) {
+<span class="nc bnc" id="L167" title="All 22 branches missed.">        switch (themePref) {</span>
+            case &quot;dark&quot;:
+<span class="nc" id="L169">                return R.style.AppTheme_NoActionBar_Dark;</span>
+            case &quot;black&quot;:
+<span class="nc" id="L171">                return R.style.AppTheme_NoActionBar_Black;</span>
+            case &quot;classic&quot;:
+<span class="nc" id="L173">                return R.style.AppTheme_NoActionBar_Classic;</span>
+            case &quot;classicdark&quot;:
+<span class="nc" id="L175">                return R.style.AppTheme_NoActionBar_Classic_Dark;</span>
+            case &quot;classicblack&quot;:
+<span class="nc" id="L177">                return R.style.AppTheme_NoActionBar_Classic_Black;</span>
+            default:
+<span class="nc" id="L179">                return R.style.AppTheme_NoActionBar;</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.4.1</div></body></html>

@@ -1,0 +1,1 @@
+cz.martykan.forecastie.test

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string msgid="4600421777120114993" name="abc_action_bar_home_description">"Prejsť na plochu"</string>
+    <string msgid="1594238315039666878" name="abc_action_bar_up_description">"Prejsť hore"</string>
+    <string msgid="3588849162933574182" name="abc_action_menu_overflow_description">"Ďalšie možnosti"</string>
+    <string msgid="4076576682505996667" name="abc_action_mode_done">"Hotovo"</string>
+    <string msgid="7468859129482906941" name="abc_activity_chooser_view_see_all">"Zobraziť všetko"</string>
+    <string msgid="2031811694353399454" name="abc_activitychooserview_choose_application">"Zvoľte aplikáciu"</string>
+    <string msgid="121134116657445385" name="abc_capital_off">"VYPNUTÉ"</string>
+    <string msgid="3405795526292276155" name="abc_capital_on">"ZAPNUTÉ"</string>
+    <string msgid="7723749260725869598" name="abc_search_hint">"Vyhľadať…"</string>
+    <string msgid="3691816814315814921" name="abc_searchview_description_clear">"Vymazať dopyt"</string>
+    <string msgid="2550479030709304392" name="abc_searchview_description_query">"Vyhľadávací dopyt"</string>
+    <string msgid="8264924765203268293" name="abc_searchview_description_search">"Hľadať"</string>
+    <string msgid="8928215447528550784" name="abc_searchview_description_submit">"Odoslať dopyt"</string>
+    <string msgid="893419373245838918" name="abc_searchview_description_voice">"Hlasové vyhľadávanie"</string>
+    <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"Zdieľať pomocou"</string>
+    <string msgid="3300176832234831527" name="abc_shareactionprovider_share_with_application">"Zdieľať s aplikáciou <ns1:g id="APPLICATION_NAME">%s</ns1:g>"</string>
+    <string msgid="1603543279005712093" name="abc_toolbar_collapse_description">"Zbaliť"</string>
+    <string name="action_about">O aplikácii</string>
+    <string name="action_graphs">Grafy</string>
+    <string name="action_refresh">Obnoviť</string>
+    <string name="action_search">Hľadať</string>
+    <string name="action_settings">Nastavenia</string>
+    <string name="action_weather_map">Počasie na mape</string>
+    <string name="app_name">Forecastie</string>
+    <string name="dash_clock_expanded_body">%1$s, %2$s\nVietor: %3$s %4$s\nTlak: %5$s %6$s\nVlhkosť: %7$s %%\n</string>
+    <string name="dash_clock_expanded_title">%1$s%2$s - %3$s</string>
+    <string name="dash_clock_status">%1$s%2$s</string>
+    <string name="dialog_cancel">Storno</string>
+    <string name="dialog_ok">OK</string>
+    <string name="downloading_data">Sťahovanie dát...</string>
+    <string name="error_dateFormat">NESPRÁVNY FORMÁT DÁTUMU</string>
+    <string name="getting_location">Získavanie Vašej polohy...</string>
+    <string name="humidity">Vlhkosť</string>
+    <string name="last_update">Posledná aktualizácia:\n %s</string>
+    <string name="last_update_widget">\nPosledná aktualizácia: %s</string>
+    <string name="later">Neskôr</string>
+    <string name="location_settings">Nastavenie umiestnenia</string>
+    <string name="location_settings_button">Nastavenia</string>
+    <string name="location_settings_message">Nie je zadané umiestnenie. Chcete sa presunúť do ponuky pre nastavenia? </string>
+    <string name="msg_city_not_found">Zadané mesto nebolo nájdené.</string>
+    <string name="msg_connection_not_available">Pripojenie nie je k dispozícii.</string>
+    <string name="msg_connection_problem">Je tu problém s Vaším internetovým pripojením.</string>
+    <string name="msg_err_parsing_json">Chyba čítania JSON.</string>
+    <string name="msg_too_many_requests">Príliš veľa požiadaviek. Skúste to znova.</string>
+    <string name="pressure">Tlak</string>
+    <string name="pressure_unit_hpa">hPa</string>
+    <string name="pressure_unit_kpa">kPa</string>
+    <string name="pressure_unit_mmhg">mm Hg</string>
+    <string name="rain">Dážď</string>
+    <string msgid="146198913615257606" name="search_menu_title">"Vyhľadávanie"</string>
+    <string name="search_title">Hľadajte mesto</string>
+    <string name="setting_apiKey">API kľúč</string>
+    <string name="setting_apiKey_summary">Vlastný API kľúč pre OpenWeatherMap</string>
+    <string name="setting_auto_detect_location">Zistiť polohu</string>
+    <string name="setting_dateFormat">Formát dátumu</string>
+    <string name="setting_dateFormatCustom">Vlastný formát dátumu</string>
+    <string name="setting_dateFormatCustom_summary">Ak je hore zvolené Vlastný, tak zadajte SimpleDateFormat, ktorý má byť použitý</string>
+    <string name="setting_differentiateDaysByTint"> Oddeliť dni farbou</string>
+    <string name="setting_displayDecimalZeroes">Zobraziť nuly za desatinnou čiarkou</string>
+    <string name="setting_lengthUnits">Jednotky dĺžky</string>
+    <string name="setting_pressureUnits">Jednotky tlaku</string>
+    <string name="setting_refreshInterval">Interval obnovenia na pozadí</string>
+    <string name="setting_showTempAsInteger">Zobraziť teplotu len ako celé číslo</string>
+    <string name="setting_speedUnits">Jednotky rýchlosti</string>
+    <string name="setting_tempUnits">Jednotky teploty</string>
+    <string name="setting_theme">Vzhľad</string>
+    <string name="setting_theme_classic">Štandardná</string>
+    <string name="setting_theme_classic_dark">Štandardná tmavá</string>
+    <string name="setting_theme_dark">Svieža tmavá</string>
+    <string name="setting_theme_fresh">Svieža</string>
+    <string name="setting_unit_Celsuis">Celzius</string>
+    <string name="setting_unit_Fahrenheit">Fahrenheit</string>
+    <string name="setting_unit_Kelvin">Kelvin</string>
+    <string name="setting_unit_hpa">hPa</string>
+    <string name="setting_unit_in">Palce (in)</string>
+    <string name="setting_unit_kpa">kPa</string>
+    <string name="setting_unit_kph">Kilometre za hodinu (km/h)</string>
+    <string name="setting_unit_mm">Millimetre (mm)</string>
+    <string name="setting_unit_mmhg">mm Hg</string>
+    <string name="setting_unit_mph">Míle za hodinu (mph)</string>
+    <string name="setting_unit_mps">Metre za sekundu (m/s)</string>
+    <string name="setting_update_location_automatically">Aktualizovať umiestnenie na pozadí</string>
+    <string name="setting_wind_direction_format">Formát zobrazenia rýchlosti vetra</string>
+    <string name="settings_none">Nikdy</string>
+    <string name="settings_title_data">Údaje</string>
+    <string name="settings_title_display">Zobrazenie</string>
+    <string name="settings_title_location">Umiestnenie</string>
+    <string name="settings_title_units">Jednotky</string>
+    <string name="speed_unit_kph">km/h</string>
+    <string name="speed_unit_mph">mph</string>
+    <string name="speed_unit_mps">m/s</string>
+    <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
+    <string name="sunrise">Brieždenie</string>
+    <string name="sunset">Súmrak</string>
+    <string name="temperature">Teplota</string>
+    <string name="today">Dnes</string>
+    <string name="tomorrow">Zajtra</string>
+    <string name="wind">Vietor</string>
+    <string name="wind_direction_east">V</string>
+    <string name="wind_direction_east_north_east">VSV</string>
+    <string name="wind_direction_east_south_east">VJV</string>
+    <string name="wind_direction_format_abbreviations">Skratky</string>
+    <string name="wind_direction_format_arrows">Šípky</string>
+    <string name="wind_direction_format_none">Žiadny ukazovateľ</string>
+    <string name="wind_direction_north">S</string>
+    <string name="wind_direction_north_east">SV</string>
+    <string name="wind_direction_north_north_east">SSV</string>
+    <string name="wind_direction_north_north_west">SSZ</string>
+    <string name="wind_direction_north_west">SZ</string>
+    <string name="wind_direction_south">J</string>
+    <string name="wind_direction_south_east">JV</string>
+    <string name="wind_direction_south_south_east">JJV</string>
+    <string name="wind_direction_south_south_west">JJZ</string>
+    <string name="wind_direction_south_west">JZ</string>
+    <string name="wind_direction_west">Z</string>
+    <string name="wind_direction_west_north_west">ZSZ</string>
+    <string name="wind_direction_west_south_west">ZJZ</string>
+</resources>

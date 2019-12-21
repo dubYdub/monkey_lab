@@ -1,0 +1,28 @@
+{
+    "logs": [
+        {
+            "outputFile": "C:\\Users\\WZL\\CACSE\\forecastie\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v27\\values-v27.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\WZL\\CACSE\\forecastie\\app\\src\\main\\res\\values-v27\\styles.xml",
+                    "from": {
+                        "startLines": "2,11",
+                        "startColumns": "4,4",
+                        "startOffsets": "57,573",
+                        "endLines": "9,18",
+                        "endColumns": "12,12",
+                        "endOffsets": "565,1129"
+                    },
+                    "to": {
+                        "startLines": "2,10",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,561",
+                        "endLines": "9,17",
+                        "endColumns": "12,12",
+                        "endOffsets": "556,1110"
+                    }
+                }
+            ]
+        }
+    ]
+}

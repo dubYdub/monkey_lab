@@ -1,0 +1,1105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MainActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.activities</a> &gt; <span class="el_source">MainActivity.java</span></div><h1>MainActivity.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.activities;
+
+import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Typeface;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import cz.martykan.forecastie.AlarmReceiver;
+import cz.martykan.forecastie.Constants;
+import cz.martykan.forecastie.R;
+import cz.martykan.forecastie.adapters.ViewPagerAdapter;
+import cz.martykan.forecastie.adapters.WeatherRecyclerAdapter;
+import cz.martykan.forecastie.fragments.AboutDialogFragment;
+import cz.martykan.forecastie.fragments.AmbiguousLocationDialogFragment;
+import cz.martykan.forecastie.fragments.RecyclerViewFragment;
+import cz.martykan.forecastie.models.Weather;
+import cz.martykan.forecastie.tasks.GenericRequestTask;
+import cz.martykan.forecastie.tasks.ParseResult;
+import cz.martykan.forecastie.tasks.TaskOutput;
+import cz.martykan.forecastie.utils.Formatting;
+import cz.martykan.forecastie.utils.UI;
+import cz.martykan.forecastie.utils.UnitConvertor;
+import cz.martykan.forecastie.widgets.AbstractWidgetProvider;
+import cz.martykan.forecastie.widgets.DashClockWeatherExtension;
+
+import static cz.martykan.forecastie.utils.TimeUtils.isDayTime;
+
+<span class="nc" id="L72">public class MainActivity extends BaseActivity implements LocationListener {</span>
+    protected static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
+
+    // Time in milliseconds; only reload weather if last update is longer ago than this value
+    private static final int NO_UPDATE_REQUIRED_THRESHOLD = 300000;
+
+<span class="nc" id="L78">    private static Map&lt;String, Integer&gt; speedUnits = new HashMap&lt;&gt;(3);</span>
+<span class="nc" id="L79">    private static Map&lt;String, Integer&gt; pressUnits = new HashMap&lt;&gt;(3);</span>
+<span class="nc" id="L80">    private static boolean mappingsInitialised = false;</span>
+
+<span class="nc" id="L82">    private Weather todayWeather = new Weather();</span>
+
+    private TextView todayTemperature;
+    private TextView todayDescription;
+    private TextView todayWind;
+    private TextView todayPressure;
+    private TextView todayHumidity;
+    private TextView todaySunrise;
+    private TextView todaySunset;
+    private TextView todayUvIndex;
+    private TextView lastUpdate;
+    private TextView todayIcon;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    private View appView;
+
+    private LocationManager locationManager;
+    private ProgressDialog progressDialog;
+
+    private int theme;
+    private boolean widgetTransparent;
+<span class="nc" id="L105">    private boolean destroyed = false;</span>
+
+<span class="nc" id="L107">    private List&lt;Weather&gt; longTermWeather = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L108">    private List&lt;Weather&gt; longTermTodayWeather = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L109">    private List&lt;Weather&gt; longTermTomorrowWeather = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L111">    public String recentCityId = &quot;&quot;;</span>
+
+    private Formatting formatting;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // Initialize the associated SharedPreferences file with default values
+<span class="nc" id="L118">        PreferenceManager.setDefaultValues(this, R.xml.prefs, false);</span>
+
+<span class="nc" id="L120">        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);</span>
+
+<span class="nc" id="L122">        widgetTransparent = prefs.getBoolean(&quot;transparentWidget&quot;, false);</span>
+<span class="nc" id="L123">        setTheme(theme = UI.getTheme(prefs.getString(&quot;theme&quot;, &quot;fresh&quot;)));</span>
+<span class="nc" id="L124">        boolean darkTheme = super.darkTheme;</span>
+<span class="nc" id="L125">        boolean blackTheme = super.blackTheme;</span>
+<span class="nc" id="L126">        formatting = new Formatting(this);</span>
+
+        // Initiate activity
+<span class="nc" id="L129">        super.onCreate(savedInstanceState);</span>
+<span class="nc" id="L130">        setContentView(R.layout.activity_scrolling);</span>
+<span class="nc" id="L131">        appView = findViewById(R.id.viewApp);</span>
+<span class="nc" id="L132">        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);</span>
+<span class="nc" id="L133">        AppBarLayout appBarLayout = findViewById(R.id.appBarLayout);</span>
+
+<span class="nc" id="L135">        progressDialog = new ProgressDialog(MainActivity.this);</span>
+
+        // Load toolbar
+<span class="nc" id="L138">        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);</span>
+<span class="nc" id="L139">        setSupportActionBar(toolbar);</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (darkTheme) {</span>
+<span class="nc" id="L141">            toolbar.setPopupTheme(R.style.AppTheme_PopupOverlay_Dark);</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        } else if (blackTheme) {</span>
+<span class="nc" id="L143">            toolbar.setPopupTheme(R.style.AppTheme_PopupOverlay_Black);</span>
+        }
+
+        // Initialize textboxes
+<span class="nc" id="L147">        todayTemperature = (TextView) findViewById(R.id.todayTemperature);</span>
+<span class="nc" id="L148">        todayDescription = (TextView) findViewById(R.id.todayDescription);</span>
+<span class="nc" id="L149">        todayWind = (TextView) findViewById(R.id.todayWind);</span>
+<span class="nc" id="L150">        todayPressure = (TextView) findViewById(R.id.todayPressure);</span>
+<span class="nc" id="L151">        todayHumidity = (TextView) findViewById(R.id.todayHumidity);</span>
+<span class="nc" id="L152">        todaySunrise = (TextView) findViewById(R.id.todaySunrise);</span>
+<span class="nc" id="L153">        todaySunset = (TextView) findViewById(R.id.todaySunset);</span>
+<span class="nc" id="L154">        todayUvIndex = (TextView) findViewById(R.id.todayUvIndex);</span>
+<span class="nc" id="L155">        lastUpdate = (TextView) findViewById(R.id.lastUpdate);</span>
+<span class="nc" id="L156">        todayIcon = (TextView) findViewById(R.id.todayIcon);</span>
+<span class="nc" id="L157">        Typeface weatherFont = Typeface.createFromAsset(this.getAssets(), &quot;fonts/weather.ttf&quot;);</span>
+<span class="nc" id="L158">        todayIcon.setTypeface(weatherFont);</span>
+
+        // Initialize viewPager
+<span class="nc" id="L161">        viewPager = (ViewPager) findViewById(R.id.viewPager);</span>
+<span class="nc" id="L162">        tabLayout = (TabLayout) findViewById(R.id.tabs);</span>
+
+<span class="nc" id="L164">        destroyed = false;</span>
+
+<span class="nc" id="L166">        initMappings();</span>
+
+        // Preload data from cache
+<span class="nc" id="L169">        preloadWeather();</span>
+<span class="nc" id="L170">        preloadUVIndex();</span>
+<span class="nc" id="L171">        updateLastUpdateTime();</span>
+
+        // Set autoupdater
+<span class="nc" id="L174">        AlarmReceiver.setRecurringAlarm(this);</span>
+
+
+<span class="nc" id="L177">        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {</span>
+            @Override
+            public void onRefresh() {
+<span class="nc" id="L180">                refreshWeather();</span>
+<span class="nc" id="L181">                swipeRefreshLayout.setRefreshing(false);</span>
+<span class="nc" id="L182">            }</span>
+        });
+
+<span class="nc" id="L185">        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {</span>
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                // Only allow pull to refresh when scrolled to top
+<span class="nc bnc" id="L189" title="All 2 branches missed.">                swipeRefreshLayout.setEnabled(verticalOffset == 0);</span>
+<span class="nc" id="L190">            }</span>
+        });
+
+<span class="nc" id="L193">        Bundle bundle = getIntent().getExtras();</span>
+
+<span class="nc bnc" id="L195" title="All 4 branches missed.">        if (bundle != null &amp;&amp; bundle.getBoolean(&quot;shouldRefresh&quot;)) {</span>
+<span class="nc" id="L196">            refreshWeather();</span>
+        }
+<span class="nc" id="L198">    }</span>
+
+    public WeatherRecyclerAdapter getAdapter(int id) {
+        WeatherRecyclerAdapter weatherRecyclerAdapter;
+<span class="nc bnc" id="L202" title="All 2 branches missed.">        if (id == 0) {</span>
+<span class="nc" id="L203">            weatherRecyclerAdapter = new WeatherRecyclerAdapter(this, longTermTodayWeather);</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        } else if (id == 1) {</span>
+<span class="nc" id="L205">            weatherRecyclerAdapter = new WeatherRecyclerAdapter(this, longTermTomorrowWeather);</span>
+        } else {
+<span class="nc" id="L207">            weatherRecyclerAdapter = new WeatherRecyclerAdapter(this, longTermWeather);</span>
+        }
+<span class="nc" id="L209">        return weatherRecyclerAdapter;</span>
+    }
+
+    @Override
+    public void onStart() {
+<span class="nc" id="L214">        super.onStart();</span>
+<span class="nc" id="L215">        updateTodayWeatherUI();</span>
+<span class="nc" id="L216">        updateLongTermWeatherUI();</span>
+<span class="nc" id="L217">        updateUVIndexUI();</span>
+<span class="nc" id="L218">    }</span>
+
+    @Override
+    public void onResume() {
+<span class="nc" id="L222">        super.onResume();</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">        if (UI.getTheme(PreferenceManager.getDefaultSharedPreferences(this).getString(&quot;theme&quot;, &quot;fresh&quot;)) != theme ||</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">                PreferenceManager.getDefaultSharedPreferences(this).getBoolean(&quot;transparentWidget&quot;, false) != widgetTransparent) {</span>
+            // Restart activity to apply theme
+<span class="nc" id="L226">            overridePendingTransition(0, 0);</span>
+<span class="nc" id="L227">            finish();</span>
+<span class="nc" id="L228">            overridePendingTransition(0, 0);</span>
+<span class="nc" id="L229">            startActivity(getIntent());</span>
+<span class="nc bnc" id="L230" title="All 4 branches missed.">        } else if (shouldUpdate() &amp;&amp; isNetworkAvailable()) {</span>
+<span class="nc" id="L231">            getTodayWeather();</span>
+<span class="nc" id="L232">            getLongTermWeather();</span>
+<span class="nc" id="L233">            getTodayUVIndex();</span>
+        }
+<span class="nc" id="L235">    }</span>
+
+    @Override
+    protected void onDestroy() {
+<span class="nc" id="L239">        super.onDestroy();</span>
+<span class="nc" id="L240">        destroyed = true;</span>
+
+<span class="nc bnc" id="L242" title="All 2 branches missed.">        if (locationManager != null) {</span>
+            try {
+<span class="nc" id="L244">                locationManager.removeUpdates(MainActivity.this);</span>
+<span class="nc" id="L245">            } catch (SecurityException e) {</span>
+<span class="nc" id="L246">                e.printStackTrace();</span>
+<span class="nc" id="L247">            }</span>
+        }
+<span class="nc" id="L249">    }</span>
+
+    private void preloadUVIndex() {
+<span class="nc" id="L252">        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);</span>
+
+<span class="nc" id="L254">        String lastUVIToday = sp.getString(&quot;lastToday&quot;, &quot;&quot;);</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">        if (!lastUVIToday.isEmpty()) {</span>
+<span class="nc" id="L256">            double latitude = todayWeather.getLat();</span>
+<span class="nc" id="L257">            double longitude = todayWeather.getLon();</span>
+<span class="nc bnc" id="L258" title="All 4 branches missed.">            if (latitude == 0 &amp;&amp; longitude == 0) {</span>
+<span class="nc" id="L259">                return;</span>
+            }
+<span class="nc" id="L261">            new TodayUVITask(this, this, progressDialog).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, &quot;coords&quot;, Double.toString(latitude), Double.toString(longitude));</span>
+        }
+<span class="nc" id="L263">    }</span>
+
+    private void preloadWeather() {
+<span class="nc" id="L266">        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);</span>
+
+<span class="nc" id="L268">        String lastToday = sp.getString(&quot;lastToday&quot;, &quot;&quot;);</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">        if (!lastToday.isEmpty()) {</span>
+<span class="nc" id="L270">            new TodayWeatherTask(this, this, progressDialog).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, &quot;cachedResponse&quot;, lastToday);</span>
+        }
+<span class="nc" id="L272">        String lastLongterm = sp.getString(&quot;lastLongterm&quot;, &quot;&quot;);</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">        if (!lastLongterm.isEmpty()) {</span>
+<span class="nc" id="L274">            new LongTermWeatherTask(this, this, progressDialog).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, &quot;cachedResponse&quot;, lastLongterm);</span>
+        }
+<span class="nc" id="L276">    }</span>
+
+    private void getTodayUVIndex() {
+<span class="nc" id="L279">        double latitude = todayWeather.getLat();</span>
+<span class="nc" id="L280">        double longitude = todayWeather.getLon();</span>
+<span class="nc" id="L281">        new TodayUVITask(this, this, progressDialog).execute(&quot;coords&quot;, Double.toString(latitude), Double.toString(longitude));</span>
+<span class="nc" id="L282">    }</span>
+
+    private void getTodayWeather() {
+<span class="nc" id="L285">        new TodayWeatherTask(this, this, progressDialog).execute();</span>
+<span class="nc" id="L286">    }</span>
+
+    private void getLongTermWeather() {
+<span class="nc" id="L289">        new LongTermWeatherTask(this, this, progressDialog).execute();</span>
+<span class="nc" id="L290">    }</span>
+
+    private void searchCities() {
+<span class="nc" id="L293">        AlertDialog.Builder alert = new AlertDialog.Builder(this);</span>
+<span class="nc" id="L294">        alert.setTitle(this.getString(R.string.search_title));</span>
+<span class="nc" id="L295">        final EditText input = new EditText(this);</span>
+<span class="nc" id="L296">        input.setInputType(InputType.TYPE_CLASS_TEXT);</span>
+<span class="nc" id="L297">        input.setMaxLines(1);</span>
+<span class="nc" id="L298">        input.setSingleLine(true);</span>
+<span class="nc" id="L299">        alert.setView(input, 32, 0, 32, 0);</span>
+
+<span class="nc" id="L301">        alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {</span>
+            public void onClick(DialogInterface dialog, int whichButton) {
+<span class="nc" id="L303">                String result = input.getText().toString();</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">                if (!result.isEmpty()) {</span>
+<span class="nc" id="L305">                    new FindCitiesByNameTask(getApplicationContext(),</span>
+<span class="nc" id="L306">                            MainActivity.this, progressDialog).execute(&quot;city&quot;, result);</span>
+                }
+<span class="nc" id="L308">            }</span>
+        });
+<span class="nc" id="L310">        alert.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {</span>
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Cancelled
+<span class="nc" id="L313">            }</span>
+        });
+<span class="nc" id="L315">        alert.show();</span>
+<span class="nc" id="L316">    }</span>
+
+    private void saveLocation(String result) {
+<span class="nc" id="L319">        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);</span>
+<span class="nc" id="L320">        recentCityId = preferences.getString(&quot;cityId&quot;, Constants.DEFAULT_CITY_ID);</span>
+
+<span class="nc" id="L322">        SharedPreferences.Editor editor = preferences.edit();</span>
+<span class="nc" id="L323">        editor.putString(&quot;cityId&quot;, result);</span>
+
+<span class="nc" id="L325">        editor.commit();</span>
+
+//        if (!recentCityId.equals(result)) {
+//            // New location, update weather
+//            getTodayWeather();
+//            getLongTermWeather();
+//            getTodayUVIndex();
+//        }
+<span class="nc" id="L333">    }</span>
+
+    private void aboutDialog() {
+<span class="nc" id="L336">        new AboutDialogFragment().show(getSupportFragmentManager(), null);</span>
+<span class="nc" id="L337">    }</span>
+
+    public static String getRainString(JSONObject rainObj) {
+<span class="nc" id="L340">        String rain = &quot;0&quot;;</span>
+<span class="nc bnc" id="L341" title="All 2 branches missed.">        if (rainObj != null) {</span>
+<span class="nc" id="L342">            rain = rainObj.optString(&quot;3h&quot;, &quot;fail&quot;);</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">            if (&quot;fail&quot;.equals(rain)) {</span>
+<span class="nc" id="L344">                rain = rainObj.optString(&quot;1h&quot;, &quot;0&quot;);</span>
+            }
+        }
+<span class="nc" id="L347">        return rain;</span>
+    }
+
+    private ParseResult parseTodayJson(String result) {
+        try {
+<span class="nc" id="L352">            JSONObject reader = new JSONObject(result);</span>
+
+<span class="nc" id="L354">            final String code = reader.optString(&quot;cod&quot;);</span>
+<span class="nc bnc" id="L355" title="All 2 branches missed.">            if (&quot;404&quot;.equals(code)) {</span>
+<span class="nc" id="L356">                return ParseResult.CITY_NOT_FOUND;</span>
+            }
+
+<span class="nc" id="L359">            String city = reader.getString(&quot;name&quot;);</span>
+<span class="nc" id="L360">            String country = &quot;&quot;;</span>
+<span class="nc" id="L361">            JSONObject countryObj = reader.optJSONObject(&quot;sys&quot;);</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">            if (countryObj != null) {</span>
+<span class="nc" id="L363">                country = countryObj.getString(&quot;country&quot;);</span>
+<span class="nc" id="L364">                todayWeather.setSunrise(countryObj.getString(&quot;sunrise&quot;));</span>
+<span class="nc" id="L365">                todayWeather.setSunset(countryObj.getString(&quot;sunset&quot;));</span>
+            }
+<span class="nc" id="L367">            todayWeather.setCity(city);</span>
+<span class="nc" id="L368">            todayWeather.setCountry(country);</span>
+
+<span class="nc" id="L370">            JSONObject coordinates = reader.getJSONObject(&quot;coord&quot;);</span>
+<span class="nc bnc" id="L371" title="All 2 branches missed.">            if (coordinates != null) {</span>
+<span class="nc" id="L372">                todayWeather.setLat(coordinates.getDouble(&quot;lat&quot;));</span>
+<span class="nc" id="L373">                todayWeather.setLon(coordinates.getDouble(&quot;lon&quot;));</span>
+<span class="nc" id="L374">                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);</span>
+<span class="nc" id="L375">                sp.edit().putFloat(&quot;latitude&quot;, (float) todayWeather.getLat()).putFloat(&quot;longitude&quot;, (float) todayWeather.getLon()).commit();</span>
+            }
+
+<span class="nc" id="L378">            JSONObject main = reader.getJSONObject(&quot;main&quot;);</span>
+
+<span class="nc" id="L380">            todayWeather.setTemperature(main.getString(&quot;temp&quot;));</span>
+<span class="nc" id="L381">            todayWeather.setDescription(reader.getJSONArray(&quot;weather&quot;).getJSONObject(0).getString(&quot;description&quot;));</span>
+<span class="nc" id="L382">            JSONObject windObj = reader.getJSONObject(&quot;wind&quot;);</span>
+<span class="nc" id="L383">            todayWeather.setWind(windObj.getString(&quot;speed&quot;));</span>
+<span class="nc bnc" id="L384" title="All 2 branches missed.">            if (windObj.has(&quot;deg&quot;)) {</span>
+<span class="nc" id="L385">                todayWeather.setWindDirectionDegree(windObj.getDouble(&quot;deg&quot;));</span>
+            } else {
+<span class="nc" id="L387">                Log.e(&quot;parseTodayJson&quot;, &quot;No wind direction available&quot;);</span>
+<span class="nc" id="L388">                todayWeather.setWindDirectionDegree(null);</span>
+            }
+<span class="nc" id="L390">            todayWeather.setPressure(main.getString(&quot;pressure&quot;));</span>
+<span class="nc" id="L391">            todayWeather.setHumidity(main.getString(&quot;humidity&quot;));</span>
+
+<span class="nc" id="L393">            JSONObject rainObj = reader.optJSONObject(&quot;rain&quot;);</span>
+            String rain;
+<span class="nc bnc" id="L395" title="All 2 branches missed.">            if (rainObj != null) {</span>
+<span class="nc" id="L396">                rain = getRainString(rainObj);</span>
+            } else {
+<span class="nc" id="L398">                JSONObject snowObj = reader.optJSONObject(&quot;snow&quot;);</span>
+<span class="nc bnc" id="L399" title="All 2 branches missed.">                if (snowObj != null) {</span>
+<span class="nc" id="L400">                    rain = getRainString(snowObj);</span>
+                } else {
+<span class="nc" id="L402">                    rain = &quot;0&quot;;</span>
+                }
+            }
+<span class="nc" id="L405">            todayWeather.setRain(rain);</span>
+
+<span class="nc" id="L407">            final String idString = reader.getJSONArray(&quot;weather&quot;).getJSONObject(0).getString(&quot;id&quot;);</span>
+<span class="nc" id="L408">            todayWeather.setId(idString);</span>
+<span class="nc" id="L409">            todayWeather.setIcon(formatting.setWeatherIcon(Integer.parseInt(idString), isDayTime(todayWeather, Calendar.getInstance())));</span>
+
+<span class="nc" id="L411">            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit();</span>
+<span class="nc" id="L412">            editor.putString(&quot;lastToday&quot;, result);</span>
+<span class="nc" id="L413">            editor.commit();</span>
+
+<span class="nc" id="L415">        } catch (JSONException e) {</span>
+<span class="nc" id="L416">            Log.e(&quot;JSONException Data&quot;, result);</span>
+<span class="nc" id="L417">            e.printStackTrace();</span>
+<span class="nc" id="L418">            return ParseResult.JSON_EXCEPTION;</span>
+<span class="nc" id="L419">        }</span>
+
+<span class="nc" id="L421">        return ParseResult.OK;</span>
+    }
+
+    private ParseResult parseTodayUVIJson(String result) {
+        try {
+<span class="nc" id="L426">            JSONObject reader = new JSONObject(result);</span>
+
+<span class="nc" id="L428">            final String code = reader.optString(&quot;cod&quot;);</span>
+<span class="nc bnc" id="L429" title="All 2 branches missed.">            if (&quot;404&quot;.equals(code)) {</span>
+<span class="nc" id="L430">                todayWeather.setUvIndex(-1);</span>
+<span class="nc" id="L431">                return ParseResult.CITY_NOT_FOUND;</span>
+            }
+
+<span class="nc" id="L434">            double value = reader.getDouble(&quot;value&quot;);</span>
+<span class="nc" id="L435">            todayWeather.setUvIndex(value);</span>
+<span class="nc" id="L436">            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit();</span>
+<span class="nc" id="L437">            editor.putString(&quot;lastUVIToday&quot;, result);</span>
+<span class="nc" id="L438">            editor.commit();</span>
+<span class="nc" id="L439">        } catch (JSONException e) {</span>
+<span class="nc" id="L440">            Log.e(&quot;JSONException Data&quot;, result);</span>
+<span class="nc" id="L441">            e.printStackTrace();</span>
+<span class="nc" id="L442">            return ParseResult.JSON_EXCEPTION;</span>
+<span class="nc" id="L443">        }</span>
+
+<span class="nc" id="L445">        return ParseResult.OK;</span>
+    }
+
+    private void updateTodayWeatherUI() {
+        try {
+<span class="nc bnc" id="L450" title="All 2 branches missed.">            if (todayWeather.getCountry().isEmpty()) {</span>
+<span class="nc" id="L451">                preloadWeather();</span>
+<span class="nc" id="L452">                return;</span>
+            }
+<span class="nc" id="L454">        } catch (Exception e) {</span>
+<span class="nc" id="L455">            preloadWeather();</span>
+<span class="nc" id="L456">            return;</span>
+<span class="nc" id="L457">        }</span>
+<span class="nc" id="L458">        String city = todayWeather.getCity();</span>
+<span class="nc" id="L459">        String country = todayWeather.getCountry();</span>
+<span class="nc" id="L460">        DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(getApplicationContext());</span>
+<span class="nc bnc" id="L461" title="All 2 branches missed.">        getSupportActionBar().setTitle(city + (country.isEmpty() ? &quot;&quot; : &quot;, &quot; + country));</span>
+
+<span class="nc" id="L463">        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);</span>
+
+        // Temperature
+<span class="nc" id="L466">        float temperature = UnitConvertor.convertTemperature(Float.parseFloat(todayWeather.getTemperature()), sp);</span>
+<span class="nc bnc" id="L467" title="All 2 branches missed.">        if (sp.getBoolean(&quot;temperatureInteger&quot;, false)) {</span>
+<span class="nc" id="L468">            temperature = Math.round(temperature);</span>
+        }
+
+        // Rain
+<span class="nc" id="L472">        double rain = Double.parseDouble(todayWeather.getRain());</span>
+<span class="nc" id="L473">        String rainString = UnitConvertor.getRainString(rain, sp);</span>
+
+        // Wind
+        double wind;
+        try {
+<span class="nc" id="L478">            wind = Double.parseDouble(todayWeather.getWind());</span>
+<span class="nc" id="L479">        } catch (Exception e) {</span>
+<span class="nc" id="L480">            e.printStackTrace();</span>
+<span class="nc" id="L481">            wind = 0;</span>
+<span class="nc" id="L482">        }</span>
+<span class="nc" id="L483">        wind = UnitConvertor.convertWind(wind, sp);</span>
+
+        // Pressure
+<span class="nc" id="L486">        double pressure = UnitConvertor.convertPressure((float) Double.parseDouble(todayWeather.getPressure()), sp);</span>
+
+<span class="nc" id="L488">        todayTemperature.setText(new DecimalFormat(&quot;0.#&quot;).format(temperature) + &quot; &quot; + sp.getString(&quot;unit&quot;, &quot;°C&quot;));</span>
+<span class="nc" id="L489">        todayDescription.setText(todayWeather.getDescription().substring(0, 1).toUpperCase() +</span>
+<span class="nc" id="L490">                todayWeather.getDescription().substring(1) + rainString);</span>
+<span class="nc bnc" id="L491" title="All 2 branches missed.">        if (sp.getString(&quot;speedUnit&quot;, &quot;m/s&quot;).equals(&quot;bft&quot;)) {</span>
+<span class="nc" id="L492">            todayWind.setText(getString(R.string.wind) + &quot;: &quot; +</span>
+<span class="nc" id="L493">                    UnitConvertor.getBeaufortName((int) wind, this) +</span>
+<span class="nc bnc" id="L494" title="All 2 branches missed.">                    (todayWeather.isWindDirectionAvailable() ? &quot; &quot; + getWindDirectionString(sp, this, todayWeather) : &quot;&quot;));</span>
+        } else {
+<span class="nc" id="L496">            todayWind.setText(getString(R.string.wind) + &quot;: &quot; + new DecimalFormat(&quot;0.0&quot;).format(wind) + &quot; &quot; +</span>
+<span class="nc" id="L497">                    localize(sp, &quot;speedUnit&quot;, &quot;m/s&quot;) +</span>
+<span class="nc bnc" id="L498" title="All 2 branches missed.">                    (todayWeather.isWindDirectionAvailable() ? &quot; &quot; + getWindDirectionString(sp, this, todayWeather) : &quot;&quot;));</span>
+        }
+<span class="nc" id="L500">        todayPressure.setText(getString(R.string.pressure) + &quot;: &quot; + new DecimalFormat(&quot;0.0&quot;).format(pressure) + &quot; &quot; +</span>
+<span class="nc" id="L501">                localize(sp, &quot;pressureUnit&quot;, &quot;hPa&quot;));</span>
+<span class="nc" id="L502">        todayHumidity.setText(getString(R.string.humidity) + &quot;: &quot; + todayWeather.getHumidity() + &quot; %&quot;);</span>
+<span class="nc" id="L503">        todaySunrise.setText(getString(R.string.sunrise) + &quot;: &quot; + timeFormat.format(todayWeather.getSunrise()));</span>
+<span class="nc" id="L504">        todaySunset.setText(getString(R.string.sunset) + &quot;: &quot; + timeFormat.format(todayWeather.getSunset()));</span>
+<span class="nc" id="L505">        todayIcon.setText(todayWeather.getIcon());</span>
+
+<span class="nc" id="L507">        todayIcon.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View view) {
+<span class="nc" id="L510">                Intent intent = new Intent(MainActivity.this, GraphActivity.class);</span>
+<span class="nc" id="L511">                startActivity(intent);</span>
+<span class="nc" id="L512">            }</span>
+        });
+<span class="nc" id="L514">    }</span>
+
+    private void updateUVIndexUI() {
+        try {
+<span class="nc bnc" id="L518" title="All 2 branches missed.">            if (todayWeather.getCountry().isEmpty()) {</span>
+<span class="nc" id="L519">                return;</span>
+            }
+<span class="nc" id="L521">        } catch (Exception e) {</span>
+<span class="nc" id="L522">            preloadUVIndex();</span>
+<span class="nc" id="L523">            return;</span>
+<span class="nc" id="L524">        }</span>
+
+        // UV Index
+<span class="nc" id="L527">        double uvIndex = todayWeather.getUvIndex();</span>
+<span class="nc" id="L528">        todayUvIndex.setText(getString(R.string.uvindex) + &quot;: &quot; + UnitConvertor.convertUvIndexToRiskLevel(uvIndex, this));</span>
+<span class="nc" id="L529">    }</span>
+
+    public ParseResult parseLongTermJson(String result) {
+        int i;
+        try {
+<span class="nc" id="L534">            JSONObject reader = new JSONObject(result);</span>
+
+<span class="nc" id="L536">            final String code = reader.optString(&quot;cod&quot;);</span>
+<span class="nc bnc" id="L537" title="All 2 branches missed.">            if (&quot;404&quot;.equals(code)) {</span>
+<span class="nc bnc" id="L538" title="All 2 branches missed.">                if (longTermWeather == null) {</span>
+<span class="nc" id="L539">                    longTermWeather = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L540">                    longTermTodayWeather = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L541">                    longTermTomorrowWeather = new ArrayList&lt;&gt;();</span>
+                }
+<span class="nc" id="L543">                return ParseResult.CITY_NOT_FOUND;</span>
+            }
+
+<span class="nc" id="L546">            longTermWeather = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L547">            longTermTodayWeather = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L548">            longTermTomorrowWeather = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L550">            JSONArray list = reader.getJSONArray(&quot;list&quot;);</span>
+<span class="nc bnc" id="L551" title="All 2 branches missed.">            for (i = 0; i &lt; list.length(); i++) {</span>
+<span class="nc" id="L552">                Weather weather = new Weather();</span>
+
+<span class="nc" id="L554">                JSONObject listItem = list.getJSONObject(i);</span>
+<span class="nc" id="L555">                JSONObject main = listItem.getJSONObject(&quot;main&quot;);</span>
+
+<span class="nc" id="L557">                weather.setDate(listItem.getString(&quot;dt&quot;));</span>
+<span class="nc" id="L558">                weather.setTemperature(main.getString(&quot;temp&quot;));</span>
+<span class="nc" id="L559">                weather.setDescription(listItem.optJSONArray(&quot;weather&quot;).getJSONObject(0).getString(&quot;description&quot;));</span>
+<span class="nc" id="L560">                JSONObject windObj = listItem.optJSONObject(&quot;wind&quot;);</span>
+<span class="nc bnc" id="L561" title="All 2 branches missed.">                if (windObj != null) {</span>
+<span class="nc" id="L562">                    weather.setWind(windObj.getString(&quot;speed&quot;));</span>
+<span class="nc" id="L563">                    weather.setWindDirectionDegree(windObj.getDouble(&quot;deg&quot;));</span>
+                }
+<span class="nc" id="L565">                weather.setPressure(main.getString(&quot;pressure&quot;));</span>
+<span class="nc" id="L566">                weather.setHumidity(main.getString(&quot;humidity&quot;));</span>
+
+<span class="nc" id="L568">                JSONObject rainObj = listItem.optJSONObject(&quot;rain&quot;);</span>
+<span class="nc" id="L569">                String rain = &quot;&quot;;</span>
+<span class="nc bnc" id="L570" title="All 2 branches missed.">                if (rainObj != null) {</span>
+<span class="nc" id="L571">                    rain = getRainString(rainObj);</span>
+                } else {
+<span class="nc" id="L573">                    JSONObject snowObj = listItem.optJSONObject(&quot;snow&quot;);</span>
+<span class="nc bnc" id="L574" title="All 2 branches missed.">                    if (snowObj != null) {</span>
+<span class="nc" id="L575">                        rain = getRainString(snowObj);</span>
+                    } else {
+<span class="nc" id="L577">                        rain = &quot;0&quot;;</span>
+                    }
+                }
+<span class="nc" id="L580">                weather.setRain(rain);</span>
+
+<span class="nc" id="L582">                final String idString = listItem.optJSONArray(&quot;weather&quot;).getJSONObject(0).getString(&quot;id&quot;);</span>
+<span class="nc" id="L583">                weather.setId(idString);</span>
+
+<span class="nc" id="L585">                final String dateMsString = listItem.getString(&quot;dt&quot;) + &quot;000&quot;;</span>
+<span class="nc" id="L586">                Calendar cal = Calendar.getInstance();</span>
+<span class="nc" id="L587">                cal.setTimeInMillis(Long.parseLong(dateMsString));</span>
+<span class="nc" id="L588">                weather.setIcon(formatting.setWeatherIcon(Integer.parseInt(idString), isDayTime(weather, cal)));</span>
+
+<span class="nc" id="L590">                Calendar today = Calendar.getInstance();</span>
+<span class="nc" id="L591">                today.set(Calendar.HOUR_OF_DAY, 0);</span>
+<span class="nc" id="L592">                today.set(Calendar.MINUTE, 0);</span>
+<span class="nc" id="L593">                today.set(Calendar.SECOND, 0);</span>
+<span class="nc" id="L594">                today.set(Calendar.MILLISECOND, 0);</span>
+
+<span class="nc" id="L596">                Calendar tomorrow = (Calendar) today.clone();</span>
+<span class="nc" id="L597">                tomorrow.add(Calendar.DAY_OF_YEAR, 1);</span>
+
+<span class="nc" id="L599">                Calendar later = (Calendar) today.clone();</span>
+<span class="nc" id="L600">                later.add(Calendar.DAY_OF_YEAR, 2);</span>
+
+<span class="nc bnc" id="L602" title="All 2 branches missed.">                if (cal.before(tomorrow)) {</span>
+<span class="nc" id="L603">                    longTermTodayWeather.add(weather);</span>
+<span class="nc bnc" id="L604" title="All 2 branches missed.">                } else if (cal.before(later)) {</span>
+<span class="nc" id="L605">                    longTermTomorrowWeather.add(weather);</span>
+                } else {
+<span class="nc" id="L607">                    longTermWeather.add(weather);</span>
+                }
+            }
+<span class="nc" id="L610">            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit();</span>
+<span class="nc" id="L611">            editor.putString(&quot;lastLongterm&quot;, result);</span>
+<span class="nc" id="L612">            editor.commit();</span>
+<span class="nc" id="L613">        } catch (JSONException e) {</span>
+<span class="nc" id="L614">            Log.e(&quot;JSONException Data&quot;, result);</span>
+<span class="nc" id="L615">            e.printStackTrace();</span>
+<span class="nc" id="L616">            return ParseResult.JSON_EXCEPTION;</span>
+<span class="nc" id="L617">        }</span>
+
+<span class="nc" id="L619">        return ParseResult.OK;</span>
+    }
+
+    private void updateLongTermWeatherUI() {
+<span class="nc bnc" id="L623" title="All 2 branches missed.">        if (destroyed) {</span>
+<span class="nc" id="L624">            return;</span>
+        }
+
+<span class="nc" id="L627">        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());</span>
+
+<span class="nc" id="L629">        Bundle bundleToday = new Bundle();</span>
+<span class="nc" id="L630">        bundleToday.putInt(&quot;day&quot;, 0);</span>
+<span class="nc" id="L631">        RecyclerViewFragment recyclerViewFragmentToday = new RecyclerViewFragment();</span>
+<span class="nc" id="L632">        recyclerViewFragmentToday.setArguments(bundleToday);</span>
+<span class="nc" id="L633">        viewPagerAdapter.addFragment(recyclerViewFragmentToday, getString(R.string.today));</span>
+
+<span class="nc" id="L635">        Bundle bundleTomorrow = new Bundle();</span>
+<span class="nc" id="L636">        bundleTomorrow.putInt(&quot;day&quot;, 1);</span>
+<span class="nc" id="L637">        RecyclerViewFragment recyclerViewFragmentTomorrow = new RecyclerViewFragment();</span>
+<span class="nc" id="L638">        recyclerViewFragmentTomorrow.setArguments(bundleTomorrow);</span>
+<span class="nc" id="L639">        viewPagerAdapter.addFragment(recyclerViewFragmentTomorrow, getString(R.string.tomorrow));</span>
+
+<span class="nc" id="L641">        Bundle bundle = new Bundle();</span>
+<span class="nc" id="L642">        bundle.putInt(&quot;day&quot;, 2);</span>
+<span class="nc" id="L643">        RecyclerViewFragment recyclerViewFragment = new RecyclerViewFragment();</span>
+<span class="nc" id="L644">        recyclerViewFragment.setArguments(bundle);</span>
+<span class="nc" id="L645">        viewPagerAdapter.addFragment(recyclerViewFragment, getString(R.string.later));</span>
+
+<span class="nc" id="L647">        int currentPage = viewPager.getCurrentItem();</span>
+
+<span class="nc" id="L649">        viewPagerAdapter.notifyDataSetChanged();</span>
+<span class="nc" id="L650">        viewPager.setAdapter(viewPagerAdapter);</span>
+<span class="nc" id="L651">        tabLayout.setupWithViewPager(viewPager);</span>
+
+<span class="nc bnc" id="L653" title="All 4 branches missed.">        if (currentPage == 0 &amp;&amp; longTermTodayWeather.isEmpty()) {</span>
+<span class="nc" id="L654">            currentPage = 1;</span>
+        }
+<span class="nc" id="L656">        viewPager.setCurrentItem(currentPage, false);</span>
+<span class="nc" id="L657">    }</span>
+
+    private boolean isNetworkAvailable() {
+<span class="nc" id="L660">        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);</span>
+<span class="nc" id="L661">        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();</span>
+<span class="nc bnc" id="L662" title="All 4 branches missed.">        return activeNetworkInfo != null &amp;&amp; activeNetworkInfo.isConnected();</span>
+    }
+
+    private boolean shouldUpdate() {
+<span class="nc" id="L666">        long lastUpdate = PreferenceManager.getDefaultSharedPreferences(this).getLong(&quot;lastUpdate&quot;, -1);</span>
+<span class="nc" id="L667">        boolean cityChanged = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(&quot;cityChanged&quot;, false);</span>
+        // Update if never checked or last update is longer ago than specified threshold
+<span class="nc bnc" id="L669" title="All 6 branches missed.">        return cityChanged || lastUpdate &lt; 0 || (Calendar.getInstance().getTimeInMillis() - lastUpdate) &gt; NO_UPDATE_REQUIRED_THRESHOLD;</span>
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+<span class="nc" id="L674">        getMenuInflater().inflate(R.menu.menu_main, menu);</span>
+<span class="nc" id="L675">        return true;</span>
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+<span class="nc" id="L680">        int id = item.getItemId();</span>
+
+<span class="nc bnc" id="L682" title="All 2 branches missed.">        if (id == R.id.action_refresh) {</span>
+<span class="nc" id="L683">            refreshWeather();</span>
+<span class="nc" id="L684">            return true;</span>
+        }
+<span class="nc bnc" id="L686" title="All 2 branches missed.">        if (id == R.id.action_map) {</span>
+<span class="nc" id="L687">            Intent intent = new Intent(MainActivity.this, MapActivity.class);</span>
+<span class="nc" id="L688">            startActivity(intent);</span>
+        }
+<span class="nc bnc" id="L690" title="All 2 branches missed.">        if (id == R.id.action_graphs) {</span>
+<span class="nc" id="L691">            Intent intent = new Intent(MainActivity.this, GraphActivity.class);</span>
+<span class="nc" id="L692">            startActivity(intent);</span>
+        }
+<span class="nc bnc" id="L694" title="All 2 branches missed.">        if (id == R.id.action_search) {</span>
+<span class="nc" id="L695">            searchCities();</span>
+<span class="nc" id="L696">            return true;</span>
+        }
+<span class="nc bnc" id="L698" title="All 2 branches missed.">        if (id == R.id.action_location) {</span>
+<span class="nc" id="L699">            getCityByLocation();</span>
+<span class="nc" id="L700">            return true;</span>
+        }
+<span class="nc bnc" id="L702" title="All 2 branches missed.">        if (id == R.id.action_settings) {</span>
+<span class="nc" id="L703">            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);</span>
+<span class="nc" id="L704">            startActivity(intent);</span>
+        }
+<span class="nc bnc" id="L706" title="All 2 branches missed.">        if (id == R.id.action_about) {</span>
+<span class="nc" id="L707">            aboutDialog();</span>
+<span class="nc" id="L708">            return true;</span>
+        }
+<span class="nc" id="L710">        return super.onOptionsItemSelected(item);</span>
+    }
+
+    public void refreshWeather() {
+<span class="nc bnc" id="L714" title="All 2 branches missed.">        if (isNetworkAvailable()) {</span>
+<span class="nc" id="L715">            getTodayWeather();</span>
+<span class="nc" id="L716">            getLongTermWeather();</span>
+<span class="nc" id="L717">            getTodayUVIndex();</span>
+        } else {
+<span class="nc" id="L719">            Snackbar.make(appView, getString(R.string.msg_connection_not_available), Snackbar.LENGTH_LONG).show();</span>
+        }
+<span class="nc" id="L721">    }</span>
+
+    public static void initMappings() {
+<span class="nc bnc" id="L724" title="All 2 branches missed.">        if (mappingsInitialised)</span>
+<span class="nc" id="L725">            return;</span>
+<span class="nc" id="L726">        mappingsInitialised = true;</span>
+<span class="nc" id="L727">        speedUnits.put(&quot;m/s&quot;, R.string.speed_unit_mps);</span>
+<span class="nc" id="L728">        speedUnits.put(&quot;kph&quot;, R.string.speed_unit_kph);</span>
+<span class="nc" id="L729">        speedUnits.put(&quot;mph&quot;, R.string.speed_unit_mph);</span>
+<span class="nc" id="L730">        speedUnits.put(&quot;kn&quot;, R.string.speed_unit_kn);</span>
+
+<span class="nc" id="L732">        pressUnits.put(&quot;hPa&quot;, R.string.pressure_unit_hpa);</span>
+<span class="nc" id="L733">        pressUnits.put(&quot;kPa&quot;, R.string.pressure_unit_kpa);</span>
+<span class="nc" id="L734">        pressUnits.put(&quot;mm Hg&quot;, R.string.pressure_unit_mmhg);</span>
+<span class="nc" id="L735">    }</span>
+
+    private String localize(SharedPreferences sp, String preferenceKey, String defaultValueKey) {
+<span class="nc" id="L738">        return localize(sp, this, preferenceKey, defaultValueKey);</span>
+    }
+
+    public static String localize(SharedPreferences sp, Context context, String preferenceKey, String defaultValueKey) {
+<span class="nc" id="L742">        String preferenceValue = sp.getString(preferenceKey, defaultValueKey);</span>
+<span class="nc" id="L743">        String result = preferenceValue;</span>
+<span class="nc bnc" id="L744" title="All 2 branches missed.">        if (&quot;speedUnit&quot;.equals(preferenceKey)) {</span>
+<span class="nc bnc" id="L745" title="All 2 branches missed.">            if (speedUnits.containsKey(preferenceValue)) {</span>
+<span class="nc" id="L746">                result = context.getString(speedUnits.get(preferenceValue));</span>
+            }
+<span class="nc bnc" id="L748" title="All 2 branches missed.">        } else if (&quot;pressureUnit&quot;.equals(preferenceKey)) {</span>
+<span class="nc bnc" id="L749" title="All 2 branches missed.">            if (pressUnits.containsKey(preferenceValue)) {</span>
+<span class="nc" id="L750">                result = context.getString(pressUnits.get(preferenceValue));</span>
+            }
+        }
+<span class="nc" id="L753">        return result;</span>
+    }
+
+    public static String getWindDirectionString(SharedPreferences sp, Context context, Weather weather) {
+        try {
+<span class="nc bnc" id="L758" title="All 2 branches missed.">            if (Double.parseDouble(weather.getWind()) != 0) {</span>
+<span class="nc" id="L759">                String pref = sp.getString(&quot;windDirectionFormat&quot;, null);</span>
+<span class="nc bnc" id="L760" title="All 2 branches missed.">                if (&quot;arrow&quot;.equals(pref)) {</span>
+<span class="nc" id="L761">                    return weather.getWindDirection(8).getArrow(context);</span>
+<span class="nc bnc" id="L762" title="All 2 branches missed.">                } else if (&quot;abbr&quot;.equals(pref)) {</span>
+<span class="nc" id="L763">                    return weather.getWindDirection().getLocalizedString(context);</span>
+                }
+            }
+<span class="nc" id="L766">        } catch (Exception e) {</span>
+<span class="nc" id="L767">            e.printStackTrace();</span>
+<span class="nc" id="L768">        }</span>
+
+<span class="nc" id="L770">        return &quot;&quot;;</span>
+    }
+
+    void getCityByLocation() {
+<span class="nc" id="L774">        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);</span>
+
+<span class="nc bnc" id="L776" title="All 2 branches missed.">        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {</span>
+<span class="nc bnc" id="L777" title="All 2 branches missed.">            if (ActivityCompat.shouldShowRequestPermissionRationale(this,</span>
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+<span class="nc" id="L779">                showLocationSettingsDialog();</span>
+            } else {
+<span class="nc" id="L781">                ActivityCompat.requestPermissions(this,</span>
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_ACCESS_FINE_LOCATION);
+            }
+
+<span class="nc bnc" id="L786" title="All 2 branches missed.">        } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||</span>
+<span class="nc bnc" id="L787" title="All 2 branches missed.">                locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {</span>
+<span class="nc" id="L788">            progressDialog = new ProgressDialog(this);</span>
+<span class="nc" id="L789">            progressDialog.setMessage(getString(R.string.getting_location));</span>
+<span class="nc" id="L790">            progressDialog.setCancelable(false);</span>
+<span class="nc" id="L791">            progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {</span>
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    try {
+<span class="nc" id="L795">                        locationManager.removeUpdates(MainActivity.this);</span>
+<span class="nc" id="L796">                    } catch (SecurityException e) {</span>
+<span class="nc" id="L797">                        e.printStackTrace();</span>
+<span class="nc" id="L798">                    }</span>
+<span class="nc" id="L799">                }</span>
+            });
+<span class="nc" id="L801">            progressDialog.show();</span>
+<span class="nc bnc" id="L802" title="All 2 branches missed.">            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {</span>
+<span class="nc" id="L803">                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);</span>
+            }
+<span class="nc bnc" id="L805" title="All 2 branches missed.">            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {</span>
+<span class="nc" id="L806">                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);</span>
+            }
+        } else {
+<span class="nc" id="L809">            showLocationSettingsDialog();</span>
+        }
+<span class="nc" id="L811">    }</span>
+
+    private void showLocationSettingsDialog() {
+<span class="nc" id="L814">        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);</span>
+<span class="nc" id="L815">        alertDialog.setTitle(R.string.location_settings);</span>
+<span class="nc" id="L816">        alertDialog.setMessage(R.string.location_settings_message);</span>
+<span class="nc" id="L817">        alertDialog.setPositiveButton(R.string.location_settings_button, new DialogInterface.OnClickListener() {</span>
+            public void onClick(DialogInterface dialog, int which) {
+<span class="nc" id="L819">                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);</span>
+<span class="nc" id="L820">                startActivity(intent);</span>
+<span class="nc" id="L821">            }</span>
+        });
+<span class="nc" id="L823">        alertDialog.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {</span>
+            public void onClick(DialogInterface dialog, int which) {
+<span class="nc" id="L825">                dialog.cancel();</span>
+<span class="nc" id="L826">            }</span>
+        });
+<span class="nc" id="L828">        alertDialog.show();</span>
+<span class="nc" id="L829">    }</span>
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+<span class="nc bnc" id="L833" title="All 2 branches missed.">        switch (requestCode) {</span>
+            case MY_PERMISSIONS_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+<span class="nc bnc" id="L836" title="All 4 branches missed.">                if (grantResults.length &gt; 0 &amp;&amp; grantResults[0] == PackageManager.PERMISSION_GRANTED) {</span>
+<span class="nc" id="L837">                    getCityByLocation();</span>
+                }
+<span class="nc" id="L839">                return;</span>
+            }
+        }
+<span class="nc" id="L842">    }</span>
+
+    @Override
+    public void onLocationChanged(Location location) {
+<span class="nc" id="L846">        progressDialog.hide();</span>
+        try {
+<span class="nc" id="L848">            locationManager.removeUpdates(this);</span>
+<span class="nc" id="L849">        } catch (SecurityException e) {</span>
+<span class="nc" id="L850">            Log.e(&quot;LocationManager&quot;, &quot;Error while trying to stop listening for location updates. This is probably a permissions issue&quot;, e);</span>
+<span class="nc" id="L851">        }</span>
+<span class="nc" id="L852">        Log.i(&quot;LOCATION (&quot; + location.getProvider().toUpperCase() + &quot;)&quot;, location.getLatitude() + &quot;, &quot; + location.getLongitude());</span>
+<span class="nc" id="L853">        double latitude = location.getLatitude();</span>
+<span class="nc" id="L854">        double longitude = location.getLongitude();</span>
+<span class="nc" id="L855">        new ProvideCityNameTask(this, this, progressDialog).execute(&quot;coords&quot;, Double.toString(latitude), Double.toString(longitude));</span>
+<span class="nc" id="L856">    }</span>
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+<span class="nc" id="L861">    }</span>
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+<span class="nc" id="L866">    }</span>
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+<span class="nc" id="L871">    }</span>
+
+
+    class TodayWeatherTask extends GenericRequestTask {
+<span class="nc" id="L875">        public TodayWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {</span>
+<span class="nc" id="L876">            super(context, activity, progressDialog);</span>
+<span class="nc" id="L877">        }</span>
+
+        @Override
+        protected void onPreExecute() {
+<span class="nc" id="L881">            loading = 0;</span>
+<span class="nc" id="L882">            super.onPreExecute();</span>
+<span class="nc" id="L883">        }</span>
+
+        @Override
+        protected void onPostExecute(TaskOutput output) {
+<span class="nc" id="L887">            super.onPostExecute(output);</span>
+            // Update widgets
+<span class="nc" id="L889">            AbstractWidgetProvider.updateWidgets(MainActivity.this);</span>
+<span class="nc" id="L890">            DashClockWeatherExtension.updateDashClock(MainActivity.this);</span>
+<span class="nc" id="L891">        }</span>
+
+        @Override
+        protected ParseResult parseResponse(String response) {
+<span class="nc" id="L895">            return parseTodayJson(response);</span>
+        }
+
+        @Override
+        protected String getAPIName() {
+<span class="nc" id="L900">            return &quot;weather&quot;;</span>
+        }
+
+        @Override
+        protected void updateMainUI() {
+<span class="nc" id="L905">            updateTodayWeatherUI();</span>
+<span class="nc" id="L906">            updateLastUpdateTime();</span>
+<span class="nc" id="L907">            updateUVIndexUI();</span>
+<span class="nc" id="L908">        }</span>
+    }
+
+    class LongTermWeatherTask extends GenericRequestTask {
+<span class="nc" id="L912">        public LongTermWeatherTask(Context context, MainActivity activity, ProgressDialog progressDialog) {</span>
+<span class="nc" id="L913">            super(context, activity, progressDialog);</span>
+<span class="nc" id="L914">        }</span>
+
+        @Override
+        protected ParseResult parseResponse(String response) {
+<span class="nc" id="L918">            return parseLongTermJson(response);</span>
+        }
+
+        @Override
+        protected String getAPIName() {
+<span class="nc" id="L923">            return &quot;forecast&quot;;</span>
+        }
+
+        @Override
+        protected void updateMainUI() {
+<span class="nc" id="L928">            updateLongTermWeatherUI();</span>
+<span class="nc" id="L929">        }</span>
+    }
+
+    class FindCitiesByNameTask extends GenericRequestTask {
+
+<span class="nc" id="L934">        public FindCitiesByNameTask(Context context, MainActivity activity, ProgressDialog progressDialog) {</span>
+<span class="nc" id="L935">            super(context, activity, progressDialog);</span>
+<span class="nc" id="L936">        }</span>
+
+        @Override
+<span class="nc" id="L939">        protected void onPreExecute() { /*Nothing*/ }</span>
+
+        @Override
+        protected ParseResult parseResponse(String response) {
+            try {
+<span class="nc" id="L944">                JSONObject reader = new JSONObject(response);</span>
+
+<span class="nc" id="L946">                final String code = reader.optString(&quot;cod&quot;);</span>
+<span class="nc bnc" id="L947" title="All 2 branches missed.">                if (&quot;404&quot;.equals(code)) {</span>
+<span class="nc" id="L948">                    Log.e(&quot;Geolocation&quot;, &quot;No city found&quot;);</span>
+<span class="nc" id="L949">                    return ParseResult.CITY_NOT_FOUND;</span>
+                }
+
+//                saveLocation(reader.getString(&quot;id&quot;));
+<span class="nc" id="L953">                final JSONArray cityList = reader.getJSONArray(&quot;list&quot;);</span>
+
+<span class="nc bnc" id="L955" title="All 2 branches missed.">                if (cityList.length() &gt; 1) {</span>
+<span class="nc" id="L956">                    launchLocationPickerDialog(cityList);</span>
+                } else {
+<span class="nc" id="L958">                    saveLocation(cityList.getJSONObject(0).getString(&quot;id&quot;));</span>
+                }
+
+<span class="nc" id="L961">            } catch (JSONException e) {</span>
+<span class="nc" id="L962">                Log.e(&quot;JSONException Data&quot;, response);</span>
+<span class="nc" id="L963">                e.printStackTrace();</span>
+<span class="nc" id="L964">                return ParseResult.JSON_EXCEPTION;</span>
+<span class="nc" id="L965">            }</span>
+
+<span class="nc" id="L967">            return ParseResult.OK;</span>
+        }
+
+        @Override
+        protected String getAPIName() {
+<span class="nc" id="L972">            return &quot;find&quot;;</span>
+        }
+
+        @Override
+        protected void onPostExecute(TaskOutput output) {
+            /* Handle possible errors only */
+<span class="nc" id="L978">            handleTaskOutput(output);</span>
+<span class="nc" id="L979">            refreshWeather();</span>
+<span class="nc" id="L980">        }</span>
+    }
+
+    private void launchLocationPickerDialog(JSONArray cityList) {
+<span class="nc" id="L984">        AmbiguousLocationDialogFragment fragment = new AmbiguousLocationDialogFragment();</span>
+<span class="nc" id="L985">        Bundle bundle = new Bundle();</span>
+<span class="nc" id="L986">        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();</span>
+
+<span class="nc" id="L988">        bundle.putString(&quot;cityList&quot;, cityList.toString());</span>
+<span class="nc" id="L989">        fragment.setArguments(bundle);</span>
+
+<span class="nc" id="L991">        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);</span>
+<span class="nc" id="L992">        fragmentTransaction.add(android.R.id.content, fragment)</span>
+<span class="nc" id="L993">                .addToBackStack(null).commit();</span>
+<span class="nc" id="L994">    }</span>
+
+    class ProvideCityNameTask extends GenericRequestTask {
+
+<span class="nc" id="L998">        public ProvideCityNameTask(Context context, MainActivity activity, ProgressDialog progressDialog) {</span>
+<span class="nc" id="L999">            super(context, activity, progressDialog);</span>
+<span class="nc" id="L1000">        }</span>
+
+        @Override
+<span class="nc" id="L1003">        protected void onPreExecute() { /*Nothing*/ }</span>
+
+        @Override
+        protected String getAPIName() {
+<span class="nc" id="L1007">            return &quot;weather&quot;;</span>
+        }
+
+        @Override
+        protected ParseResult parseResponse(String response) {
+<span class="nc" id="L1012">            Log.i(&quot;RESULT&quot;, response.toString());</span>
+            try {
+<span class="nc" id="L1014">                JSONObject reader = new JSONObject(response);</span>
+
+<span class="nc" id="L1016">                final String code = reader.optString(&quot;cod&quot;);</span>
+<span class="nc bnc" id="L1017" title="All 2 branches missed.">                if (&quot;404&quot;.equals(code)) {</span>
+<span class="nc" id="L1018">                    Log.e(&quot;Geolocation&quot;, &quot;No city found&quot;);</span>
+<span class="nc" id="L1019">                    return ParseResult.CITY_NOT_FOUND;</span>
+                }
+
+<span class="nc" id="L1022">                saveLocation(reader.getString(&quot;id&quot;));</span>
+
+<span class="nc" id="L1024">            } catch (JSONException e) {</span>
+<span class="nc" id="L1025">                Log.e(&quot;JSONException Data&quot;, response);</span>
+<span class="nc" id="L1026">                e.printStackTrace();</span>
+<span class="nc" id="L1027">                return ParseResult.JSON_EXCEPTION;</span>
+<span class="nc" id="L1028">            }</span>
+
+<span class="nc" id="L1030">            return ParseResult.OK;</span>
+        }
+
+        @Override
+        protected void onPostExecute(TaskOutput output) {
+            /* Handle possible errors only */
+<span class="nc" id="L1036">            handleTaskOutput(output);</span>
+
+<span class="nc" id="L1038">            refreshWeather();</span>
+<span class="nc" id="L1039">        }</span>
+    }
+
+    class TodayUVITask extends GenericRequestTask {
+<span class="nc" id="L1043">        public TodayUVITask(Context context, MainActivity activity, ProgressDialog progressDialog) {</span>
+<span class="nc" id="L1044">            super(context, activity, progressDialog);</span>
+<span class="nc" id="L1045">        }</span>
+
+        @Override
+        protected void onPreExecute() {
+<span class="nc" id="L1049">            loading = 0;</span>
+<span class="nc" id="L1050">            super.onPreExecute();</span>
+<span class="nc" id="L1051">        }</span>
+
+        @Override
+        protected ParseResult parseResponse(String response) {
+<span class="nc" id="L1055">            return parseTodayUVIJson(response);</span>
+        }
+
+        @Override
+        protected String getAPIName() {
+<span class="nc" id="L1060">            return &quot;uvi&quot;;</span>
+        }
+
+        @Override
+        protected void updateMainUI() {
+<span class="nc" id="L1065">            updateUVIndexUI();</span>
+<span class="nc" id="L1066">        }</span>
+    }
+
+    public static long saveLastUpdateTime(SharedPreferences sp) {
+<span class="nc" id="L1070">        Calendar now = Calendar.getInstance();</span>
+<span class="nc" id="L1071">        sp.edit().putLong(&quot;lastUpdate&quot;, now.getTimeInMillis()).commit();</span>
+<span class="nc" id="L1072">        return now.getTimeInMillis();</span>
+    }
+
+    private void updateLastUpdateTime() {
+<span class="nc" id="L1076">        updateLastUpdateTime(</span>
+<span class="nc" id="L1077">                PreferenceManager.getDefaultSharedPreferences(this).getLong(&quot;lastUpdate&quot;, -1)</span>
+        );
+<span class="nc" id="L1079">    }</span>
+
+    private void updateLastUpdateTime(long timeInMillis) {
+<span class="nc bnc" id="L1082" title="All 2 branches missed.">        if (timeInMillis &lt; 0) {</span>
+            // No time
+<span class="nc" id="L1084">            lastUpdate.setText(&quot;&quot;);</span>
+        } else {
+<span class="nc" id="L1086">            lastUpdate.setText(getString(R.string.last_update, formatTimeWithDayIfNotToday(this, timeInMillis)));</span>
+        }
+<span class="nc" id="L1088">    }</span>
+
+    public static String formatTimeWithDayIfNotToday(Context context, long timeInMillis) {
+<span class="nc" id="L1091">        Calendar now = Calendar.getInstance();</span>
+<span class="nc" id="L1092">        Calendar lastCheckedCal = new GregorianCalendar();</span>
+<span class="nc" id="L1093">        lastCheckedCal.setTimeInMillis(timeInMillis);</span>
+<span class="nc" id="L1094">        Date lastCheckedDate = new Date(timeInMillis);</span>
+<span class="nc" id="L1095">        String timeFormat = android.text.format.DateFormat.getTimeFormat(context).format(lastCheckedDate);</span>
+<span class="nc bnc" id="L1096" title="All 2 branches missed.">        if (now.get(Calendar.YEAR) == lastCheckedCal.get(Calendar.YEAR) &amp;&amp;</span>
+<span class="nc bnc" id="L1097" title="All 2 branches missed.">                now.get(Calendar.DAY_OF_YEAR) == lastCheckedCal.get(Calendar.DAY_OF_YEAR)) {</span>
+            // Same day, only show time
+<span class="nc" id="L1099">            return timeFormat;</span>
+        } else {
+<span class="nc" id="L1101">            return android.text.format.DateFormat.getDateFormat(context).format(lastCheckedDate) + &quot; &quot; + timeFormat;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.4.1</div></body></html>

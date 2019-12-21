@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LocationsRecyclerAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.adapters</a> &gt; <span class="el_source">LocationsRecyclerAdapter.java</span></div><h1>LocationsRecyclerAdapter.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.adapters;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import cz.martykan.forecastie.R;
+import cz.martykan.forecastie.models.Weather;
+
+public class LocationsRecyclerAdapter extends RecyclerView.Adapter&lt;LocationsRecyclerAdapter.LocationsViewHolder&gt; {
+    private LayoutInflater inflater;
+    private ItemClickListener itemClickListener;
+    private Context context;
+    private ArrayList&lt;Weather&gt; weatherArrayList;
+    private boolean darkTheme;
+    private boolean blackTheme;
+
+<span class="nc" id="L28">    public LocationsRecyclerAdapter(Context context, ArrayList&lt;Weather&gt; weatherArrayList, boolean darkTheme, boolean blackTheme) {</span>
+<span class="nc" id="L29">        this.context = context;</span>
+<span class="nc" id="L30">        this.weatherArrayList = weatherArrayList;</span>
+<span class="nc" id="L31">        this.darkTheme = darkTheme;</span>
+<span class="nc" id="L32">        this.blackTheme = blackTheme;</span>
+
+<span class="nc" id="L34">        inflater = LayoutInflater.from(context);</span>
+<span class="nc" id="L35">    }</span>
+
+    @Override
+    public LocationsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+<span class="nc" id="L39">        return new LocationsViewHolder(inflater.inflate(R.layout.list_location_row, parent, false));</span>
+    }
+
+    @SuppressLint(&quot;SetJavaScriptEnabled&quot;)
+    @Override
+    public void onBindViewHolder(LocationsViewHolder holder, int position) {
+<span class="nc" id="L45">        Typeface weatherFont = Typeface.createFromAsset(context.getAssets(), &quot;fonts/weather.ttf&quot;);</span>
+<span class="nc" id="L46">        Weather weather = weatherArrayList.get(position);</span>
+
+<span class="nc" id="L48">        holder.cityTextView.setText(String.format(&quot;%s, %s&quot;, weather.getCity(), weather.getCountry()));</span>
+<span class="nc" id="L49">        holder.temperatureTextView.setText(weather.getTemperature());</span>
+<span class="nc" id="L50">        holder.descriptionTextView.setText(weather.getDescription());</span>
+<span class="nc" id="L51">        holder.iconTextView.setText(weather.getIcon());</span>
+<span class="nc" id="L52">        holder.iconTextView.setTypeface(weatherFont);</span>
+
+<span class="nc" id="L54">        holder.webView.getSettings().setJavaScriptEnabled(true);</span>
+<span class="nc" id="L55">        holder.webView.loadUrl(&quot;file:///android_asset/map.html?lat=&quot; + weather.getLat()+ &quot;&amp;lon=&quot; + weather.getLon() + &quot;&amp;appid=&quot; + &quot;notneeded&amp;displayPin=true&quot;);</span>
+
+<span class="nc bnc" id="L57" title="All 4 branches missed.">        if (darkTheme || blackTheme) {</span>
+<span class="nc" id="L58">            holder.cityTextView.setTextColor(Color.WHITE);</span>
+<span class="nc" id="L59">            holder.temperatureTextView.setTextColor(Color.WHITE);</span>
+<span class="nc" id="L60">            holder.descriptionTextView.setTextColor(Color.WHITE);</span>
+<span class="nc" id="L61">            holder.iconTextView.setTextColor(Color.WHITE);</span>
+        }
+
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (darkTheme) {</span>
+<span class="nc" id="L65">            holder.cardView.setCardBackgroundColor(Color.parseColor(&quot;#2e3c43&quot;));</span>
+        }
+
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (blackTheme) {</span>
+<span class="nc" id="L69">            holder.cardView.setCardBackgroundColor(Color.parseColor(&quot;#2f2f2f&quot;));</span>
+        }
+<span class="nc" id="L71">    }</span>
+
+    @Override
+    public int getItemCount() {
+<span class="nc" id="L75">        return weatherArrayList.size();</span>
+    }
+
+    class LocationsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private TextView cityTextView;
+        private TextView temperatureTextView;
+        private TextView descriptionTextView;
+        private TextView iconTextView;
+        private WebView webView;
+        private CardView cardView;
+
+<span class="nc" id="L86">        LocationsViewHolder(View itemView) {</span>
+<span class="nc" id="L87">            super(itemView);</span>
+
+<span class="nc" id="L89">            cityTextView = itemView.findViewById(R.id.rowCityTextView);</span>
+<span class="nc" id="L90">            temperatureTextView = itemView.findViewById(R.id.rowTemperatureTextView);</span>
+<span class="nc" id="L91">            descriptionTextView = itemView.findViewById(R.id.rowDescriptionTextView);</span>
+<span class="nc" id="L92">            iconTextView = itemView.findViewById(R.id.rowIconTextView);</span>
+<span class="nc" id="L93">            webView = itemView.findViewById(R.id.webView2);</span>
+<span class="nc" id="L94">            cardView = itemView.findViewById(R.id.rowCardView);</span>
+
+<span class="nc" id="L96">            itemView.setOnClickListener(this);</span>
+<span class="nc" id="L97">        }</span>
+
+        @Override
+        public void onClick(View view) {
+<span class="nc bnc" id="L101" title="All 2 branches missed.">            if (itemClickListener != null) {</span>
+<span class="nc" id="L102">                itemClickListener.onItemClickListener(view, getAdapterPosition());</span>
+            }
+<span class="nc" id="L104">        }</span>
+    }
+
+    public Weather getItem(int position) {
+<span class="nc" id="L108">        return weatherArrayList.get(position);</span>
+    }
+
+    public void setClickListener(ItemClickListener itemClickListener) {
+<span class="nc" id="L112">        this.itemClickListener = itemClickListener;</span>
+<span class="nc" id="L113">    }</span>
+
+    public interface ItemClickListener {
+        void onItemClickListener(View view, int position);
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeatherRecyclerAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.adapters</a> &gt; <span class="el_source">WeatherRecyclerAdapter.java</span></div><h1>WeatherRecyclerAdapter.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.adapters;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.TypedArray;
+import android.graphics.Typeface;
+import android.preference.PreferenceManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+import cz.martykan.forecastie.R;
+import cz.martykan.forecastie.activities.MainActivity;
+import cz.martykan.forecastie.models.Weather;
+import cz.martykan.forecastie.models.WeatherViewHolder;
+import cz.martykan.forecastie.utils.UnitConvertor;
+
+public class WeatherRecyclerAdapter extends RecyclerView.Adapter&lt;WeatherViewHolder&gt; {
+    private List&lt;Weather&gt; itemList;
+    private Context context;
+
+<span class="fc" id="L29">    public WeatherRecyclerAdapter(Context context, List&lt;Weather&gt; itemList) {</span>
+<span class="fc" id="L30">        this.itemList = itemList;</span>
+<span class="fc" id="L31">        this.context = context;</span>
+<span class="fc" id="L32">    }</span>
+
+    @Override
+    public WeatherViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+<span class="fc" id="L36">        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, null);</span>
+
+<span class="fc" id="L38">        WeatherViewHolder viewHolder = new WeatherViewHolder(view);</span>
+<span class="fc" id="L39">        return viewHolder;</span>
+    }
+
+    @Override
+    public void onBindViewHolder(WeatherViewHolder customViewHolder, int i) {
+<span class="fc" id="L44">        Weather weatherItem = itemList.get(i);</span>
+
+<span class="fc" id="L46">        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);</span>
+
+        // Temperature
+<span class="fc" id="L49">        float temperature = UnitConvertor.convertTemperature(Float.parseFloat(weatherItem.getTemperature()), sp);</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (sp.getBoolean(&quot;temperatureInteger&quot;, false)) {</span>
+<span class="nc" id="L51">            temperature = Math.round(temperature);</span>
+        }
+
+        // Rain
+<span class="fc" id="L55">        double rain = Double.parseDouble(weatherItem.getRain());</span>
+<span class="fc" id="L56">        String rainString = UnitConvertor.getRainString(rain, sp);</span>
+
+        // Wind
+        double wind;
+        try {
+<span class="fc" id="L61">            wind = Double.parseDouble(weatherItem.getWind());</span>
+<span class="nc" id="L62">        } catch (Exception e) {</span>
+<span class="nc" id="L63">            e.printStackTrace();</span>
+<span class="nc" id="L64">            wind = 0;</span>
+<span class="fc" id="L65">        }</span>
+<span class="fc" id="L66">        wind = UnitConvertor.convertWind(wind, sp);</span>
+
+        // Pressure
+<span class="fc" id="L69">        double pressure = UnitConvertor.convertPressure((float) Double.parseDouble(weatherItem.getPressure()), sp);</span>
+
+<span class="fc" id="L71">        TimeZone tz = TimeZone.getDefault();</span>
+<span class="fc" id="L72">        String defaultDateFormat = context.getResources().getStringArray(R.array.dateFormatsValues)[0];</span>
+<span class="fc" id="L73">        String dateFormat = sp.getString(&quot;dateFormat&quot;, defaultDateFormat);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (&quot;custom&quot;.equals(dateFormat)) {</span>
+<span class="nc" id="L75">            dateFormat = sp.getString(&quot;dateFormatCustom&quot;, defaultDateFormat);</span>
+        }
+        String dateString;
+        try {
+<span class="fc" id="L79">            SimpleDateFormat resultFormat = new SimpleDateFormat(dateFormat);</span>
+<span class="fc" id="L80">            resultFormat.setTimeZone(tz);</span>
+<span class="fc" id="L81">            dateString = resultFormat.format(weatherItem.getDate());</span>
+<span class="nc" id="L82">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L83">            dateString = context.getResources().getString(R.string.error_dateFormat);</span>
+<span class="fc" id="L84">        }</span>
+
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">        if (sp.getBoolean(&quot;differentiateDaysByTint&quot;, false)) {</span>
+<span class="nc" id="L87">            Date now = new Date();</span>
+            /* Unfortunately, the getColor() that takes a theme (the next commented line) is Android 6.0 only, so we have to do it manually
+             * customViewHolder.itemView.setBackgroundColor(context.getResources().getColor(R.attr.colorTintedBackground, context.getTheme())); */
+            int color;
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (weatherItem.getNumDaysFrom(now) &gt; 1) {</span>
+<span class="nc" id="L92">                TypedArray ta = context.obtainStyledAttributes(new int[]{R.attr.colorTintedBackground, R.attr.colorBackground});</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">                if (weatherItem.getNumDaysFrom(now) % 2 == 1) {</span>
+<span class="nc" id="L94">                    color = ta.getColor(0, context.getResources().getColor(R.color.colorTintedBackground));</span>
+                } else {
+                    /* We must explicitly set things back, because RecyclerView seems to reuse views and
+                     * without restoring back the &quot;normal&quot; color, just about everything gets tinted if we
+                     * scroll a couple of times! */
+<span class="nc" id="L99">                    color = ta.getColor(1, context.getResources().getColor(R.color.colorBackground));</span>
+                }
+<span class="nc" id="L101">                ta.recycle();</span>
+<span class="nc" id="L102">                customViewHolder.itemView.setBackgroundColor(color);</span>
+            }
+        }
+
+<span class="fc" id="L106">        customViewHolder.itemDate.setText(dateString);</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (sp.getBoolean(&quot;displayDecimalZeroes&quot;, false)) {</span>
+<span class="nc" id="L108">            customViewHolder.itemTemperature.setText(new DecimalFormat(&quot;0.0&quot;).format(temperature) + &quot; &quot; + sp.getString(&quot;unit&quot;, &quot;掳C&quot;));</span>
+        } else {
+<span class="fc" id="L110">            customViewHolder.itemTemperature.setText(new DecimalFormat(&quot;#.#&quot;).format(temperature) + &quot; &quot; + sp.getString(&quot;unit&quot;, &quot;掳C&quot;));</span>
+        }
+<span class="fc" id="L112">        customViewHolder.itemDescription.setText(weatherItem.getDescription().substring(0, 1).toUpperCase() +</span>
+<span class="fc" id="L113">                weatherItem.getDescription().substring(1) + rainString);</span>
+<span class="fc" id="L114">        Typeface weatherFont = Typeface.createFromAsset(context.getAssets(), &quot;fonts/weather.ttf&quot;);</span>
+<span class="fc" id="L115">        customViewHolder.itemIcon.setTypeface(weatherFont);</span>
+<span class="fc" id="L116">        customViewHolder.itemIcon.setText(weatherItem.getIcon());</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        if (sp.getString(&quot;speedUnit&quot;, &quot;m/s&quot;).equals(&quot;bft&quot;)) {</span>
+<span class="nc" id="L118">            customViewHolder.itemyWind.setText(context.getString(R.string.wind) + &quot;: &quot; +</span>
+<span class="nc" id="L119">                    UnitConvertor.getBeaufortName((int) wind, context) + &quot; &quot; + MainActivity.getWindDirectionString(sp, context, weatherItem));</span>
+        } else {
+<span class="fc" id="L121">            customViewHolder.itemyWind.setText(context.getString(R.string.wind) + &quot;: &quot; + new DecimalFormat(&quot;0.0&quot;).format(wind) + &quot; &quot; +</span>
+<span class="fc" id="L122">                    MainActivity.localize(sp, context, &quot;speedUnit&quot;, &quot;m/s&quot;)</span>
+<span class="fc" id="L123">                    + &quot; &quot; + MainActivity.getWindDirectionString(sp, context, weatherItem));</span>
+        }
+<span class="fc" id="L125">        customViewHolder.itemPressure.setText(context.getString(R.string.pressure) + &quot;: &quot; + new DecimalFormat(&quot;0.0&quot;).format(pressure) + &quot; &quot; +</span>
+<span class="fc" id="L126">                MainActivity.localize(sp, context, &quot;pressureUnit&quot;, &quot;hPa&quot;));</span>
+<span class="fc" id="L127">        customViewHolder.itemHumidity.setText(context.getString(R.string.humidity) + &quot;: &quot; + weatherItem.getHumidity() + &quot; %&quot;);</span>
+<span class="fc" id="L128">    }</span>
+
+    @Override
+    public int getItemCount() {
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        return (null != itemList ? itemList.size() : 0);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

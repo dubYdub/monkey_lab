@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.activities</a> &gt; <span class="el_source">GraphActivity.java</span></div><h1>GraphActivity.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.activities;
+
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.widget.TextView;
+
+import com.db.chart.Tools;
+import com.db.chart.model.LineSet;
+import com.db.chart.view.ChartView;
+import com.db.chart.view.LineChartView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.TimeZone;
+
+import cz.martykan.forecastie.R;
+import cz.martykan.forecastie.models.Weather;
+import cz.martykan.forecastie.tasks.ParseResult;
+import cz.martykan.forecastie.utils.UnitConvertor;
+
+<span class="nc" id="L32">public class GraphActivity extends BaseActivity {</span>
+
+    private SharedPreferences sp;
+
+<span class="nc" id="L36">    private ArrayList&lt;Weather&gt; weatherList = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L38">    private float minTemp = 100000;</span>
+<span class="nc" id="L39">    private float maxTemp = 0;</span>
+
+<span class="nc" id="L41">    private float minRain = 100000;</span>
+<span class="nc" id="L42">    private float maxRain = 0;</span>
+
+<span class="nc" id="L44">    private float minPressure = 100000;</span>
+<span class="nc" id="L45">    private float maxPressure = 0;</span>
+
+<span class="nc" id="L47">    private float minWindSpeed = 100000;</span>
+<span class="nc" id="L48">    private float maxWindSpeed = 0;</span>
+
+<span class="nc" id="L50">    private String labelColor = &quot;#000000&quot;;</span>
+<span class="nc" id="L51">    private String lineColor = &quot;#333333&quot;;</span>
+
+<span class="nc" id="L53">    private boolean darkTheme = false;</span>
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L57">        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);</span>
+<span class="nc" id="L58">        setTheme(theme = getTheme(prefs.getString(&quot;theme&quot;, &quot;fresh&quot;)));</span>
+<span class="nc bnc" id="L59" title="All 8 branches missed.">        darkTheme = theme == R.style.AppTheme_NoActionBar_Dark ||</span>
+                theme == R.style.AppTheme_NoActionBar_Black ||
+                theme == R.style.AppTheme_NoActionBar_Classic_Dark ||
+                theme == R.style.AppTheme_NoActionBar_Classic_Black;
+
+<span class="nc" id="L64">        super.onCreate(savedInstanceState);</span>
+<span class="nc" id="L65">        setContentView(R.layout.activity_graph);</span>
+
+<span class="nc" id="L67">        Toolbar toolbar = findViewById(R.id.graph_toolbar);</span>
+<span class="nc" id="L68">        setSupportActionBar(toolbar);</span>
+<span class="nc" id="L69">        getSupportActionBar().setDisplayHomeAsUpEnabled(true);</span>
+
+<span class="nc" id="L71">        TextView temperatureTextView = findViewById(R.id.graphTemperatureTextView);</span>
+<span class="nc" id="L72">        TextView rainTextView = findViewById(R.id.graphRainTextView);</span>
+<span class="nc" id="L73">        TextView pressureTextView = findViewById(R.id.graphPressureTextView);</span>
+<span class="nc" id="L74">        TextView windSpeedTextView = findViewById(R.id.graphWindSpeedTextView);</span>
+
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (darkTheme) {</span>
+<span class="nc" id="L77">            toolbar.setPopupTheme(R.style.AppTheme_PopupOverlay_Dark);</span>
+<span class="nc" id="L78">            labelColor = &quot;#FFFFFF&quot;;</span>
+<span class="nc" id="L79">            lineColor = &quot;#FAFAFA&quot;;</span>
+
+<span class="nc" id="L81">            temperatureTextView.setTextColor(Color.parseColor(labelColor));</span>
+<span class="nc" id="L82">            rainTextView.setTextColor(Color.parseColor(labelColor));</span>
+<span class="nc" id="L83">            pressureTextView.setTextColor(Color.parseColor(labelColor));</span>
+<span class="nc" id="L84">            windSpeedTextView.setTextColor(Color.parseColor(labelColor));</span>
+        }
+
+<span class="nc" id="L87">        sp = PreferenceManager.getDefaultSharedPreferences(GraphActivity.this);</span>
+<span class="nc" id="L88">        String lastLongterm = sp.getString(&quot;lastLongterm&quot;, &quot;&quot;);</span>
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (parseLongTermJson(lastLongterm) == ParseResult.OK) {</span>
+<span class="nc" id="L91">            temperatureGraph();</span>
+<span class="nc" id="L92">            rainGraph();</span>
+<span class="nc" id="L93">            pressureGraph();</span>
+<span class="nc" id="L94">            windSpeedGraph();</span>
+        } else {
+<span class="nc" id="L96">            Snackbar.make(findViewById(android.R.id.content), R.string.msg_err_parsing_json, Snackbar.LENGTH_LONG).show();</span>
+        }
+<span class="nc" id="L98">    }</span>
+
+    private void temperatureGraph() {
+<span class="nc" id="L101">        LineChartView lineChartView = findViewById(R.id.graph_temperature);</span>
+
+        // Data
+<span class="nc" id="L104">        LineSet dataset = new LineSet();</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        for (int i = 0; i &lt; weatherList.size(); i++) {</span>
+<span class="nc" id="L106">            float temperature = UnitConvertor.convertTemperature(Float.parseFloat(weatherList.get(i).getTemperature()), sp);</span>
+
+<span class="nc bnc" id="L108" title="All 2 branches missed.">            if (temperature &lt; minTemp) {</span>
+<span class="nc" id="L109">                minTemp = temperature;</span>
+            }
+
+<span class="nc bnc" id="L112" title="All 2 branches missed.">            if (temperature &gt; maxTemp) {</span>
+<span class="nc" id="L113">                maxTemp = temperature;</span>
+            }
+
+<span class="nc" id="L116">            dataset.addPoint(getDateLabel(weatherList.get(i), i), temperature);</span>
+        }
+<span class="nc" id="L118">        dataset.setSmooth(false);</span>
+<span class="nc" id="L119">        dataset.setColor(Color.parseColor(&quot;#FF5722&quot;));</span>
+<span class="nc" id="L120">        dataset.setThickness(4);</span>
+
+<span class="nc" id="L122">        lineChartView.addData(dataset);</span>
+
+        // Grid
+<span class="nc" id="L125">        Paint paint = new Paint();</span>
+<span class="nc" id="L126">        paint.setStyle(Paint.Style.STROKE);</span>
+<span class="nc" id="L127">        paint.setAntiAlias(true);</span>
+<span class="nc" id="L128">        paint.setColor(Color.parseColor(lineColor));</span>
+<span class="nc" id="L129">        paint.setPathEffect(new DashPathEffect(new float[]{10, 10}, 0));</span>
+<span class="nc" id="L130">        paint.setStrokeWidth(1);</span>
+<span class="nc" id="L131">        lineChartView.setGrid(ChartView.GridType.HORIZONTAL, paint);</span>
+<span class="nc" id="L132">        lineChartView.setBorderSpacing(Tools.fromDpToPx(10));</span>
+<span class="nc" id="L133">        lineChartView.setAxisBorderValues((Math.round(minTemp)) - 1, (Math.round(maxTemp)) + 1);</span>
+<span class="nc" id="L134">        lineChartView.setStep(2);</span>
+<span class="nc" id="L135">        lineChartView.setXAxis(false);</span>
+<span class="nc" id="L136">        lineChartView.setYAxis(false);</span>
+<span class="nc" id="L137">        lineChartView.setLabelsColor(Color.parseColor(labelColor));</span>
+
+<span class="nc" id="L139">        lineChartView.show();</span>
+<span class="nc" id="L140">    }</span>
+
+    private void rainGraph() {
+<span class="nc" id="L143">        LineChartView lineChartView = findViewById(R.id.graph_rain);</span>
+
+        // Data
+<span class="nc" id="L146">        LineSet dataset = new LineSet();</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        for (int i = 0; i &lt; weatherList.size(); i++) {</span>
+<span class="nc" id="L148">            float rain = Float.parseFloat(weatherList.get(i).getRain());</span>
+
+<span class="nc bnc" id="L150" title="All 2 branches missed.">            if (rain &lt; minRain) {</span>
+<span class="nc" id="L151">                minRain = rain;</span>
+            }
+
+<span class="nc bnc" id="L154" title="All 2 branches missed.">            if (rain &gt; maxRain) {</span>
+<span class="nc" id="L155">                maxRain = rain;</span>
+            }
+
+<span class="nc" id="L158">            dataset.addPoint(getDateLabel(weatherList.get(i), i), rain);</span>
+        }
+<span class="nc" id="L160">        dataset.setSmooth(false);</span>
+<span class="nc" id="L161">        dataset.setColor(Color.parseColor(&quot;#2196F3&quot;));</span>
+<span class="nc" id="L162">        dataset.setThickness(4);</span>
+
+<span class="nc" id="L164">        lineChartView.addData(dataset);</span>
+
+        // Grid
+<span class="nc" id="L167">        Paint paint = new Paint();</span>
+<span class="nc" id="L168">        paint.setStyle(Paint.Style.STROKE);</span>
+<span class="nc" id="L169">        paint.setAntiAlias(true);</span>
+<span class="nc" id="L170">        paint.setColor(Color.parseColor(lineColor));</span>
+<span class="nc" id="L171">        paint.setPathEffect(new DashPathEffect(new float[]{10, 10}, 0));</span>
+<span class="nc" id="L172">        paint.setStrokeWidth(1);</span>
+<span class="nc" id="L173">        lineChartView.setGrid(ChartView.GridType.HORIZONTAL, paint);</span>
+<span class="nc" id="L174">        lineChartView.setBorderSpacing(Tools.fromDpToPx(10));</span>
+<span class="nc" id="L175">        lineChartView.setAxisBorderValues(0, (Math.round(maxRain)) + 1);</span>
+<span class="nc" id="L176">        lineChartView.setStep(1);</span>
+<span class="nc" id="L177">        lineChartView.setXAxis(false);</span>
+<span class="nc" id="L178">        lineChartView.setYAxis(false);</span>
+<span class="nc" id="L179">        lineChartView.setLabelsColor(Color.parseColor(labelColor));</span>
+
+<span class="nc" id="L181">        lineChartView.show();</span>
+<span class="nc" id="L182">    }</span>
+
+    private void pressureGraph() {
+<span class="nc" id="L185">        LineChartView lineChartView = findViewById(R.id.graph_pressure);</span>
+
+        // Data
+<span class="nc" id="L188">        LineSet dataset = new LineSet();</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">        for (int i = 0; i &lt; weatherList.size(); i++) {</span>
+<span class="nc" id="L190">            float pressure = UnitConvertor.convertPressure(Float.parseFloat(weatherList.get(i).getPressure()), sp);</span>
+
+<span class="nc bnc" id="L192" title="All 2 branches missed.">            if (pressure &lt; minPressure) {</span>
+<span class="nc" id="L193">                minPressure = pressure;</span>
+            }
+
+<span class="nc bnc" id="L196" title="All 2 branches missed.">            if (pressure &gt; maxPressure) {</span>
+<span class="nc" id="L197">                maxPressure = pressure;</span>
+            }
+
+<span class="nc" id="L200">            dataset.addPoint(getDateLabel(weatherList.get(i), i), pressure);</span>
+        }
+<span class="nc" id="L202">        dataset.setSmooth(false);</span>
+<span class="nc" id="L203">        dataset.setColor(Color.parseColor(&quot;#4CAF50&quot;));</span>
+<span class="nc" id="L204">        dataset.setThickness(4);</span>
+
+<span class="nc" id="L206">        lineChartView.addData(dataset);</span>
+
+        // Grid
+<span class="nc" id="L209">        Paint paint = new Paint();</span>
+<span class="nc" id="L210">        paint.setStyle(Paint.Style.STROKE);</span>
+<span class="nc" id="L211">        paint.setAntiAlias(true);</span>
+<span class="nc" id="L212">        paint.setColor(Color.parseColor(lineColor));</span>
+<span class="nc" id="L213">        paint.setPathEffect(new DashPathEffect(new float[]{10, 10}, 0));</span>
+<span class="nc" id="L214">        paint.setStrokeWidth(1);</span>
+<span class="nc" id="L215">        lineChartView.setGrid(ChartView.GridType.HORIZONTAL, paint);</span>
+<span class="nc" id="L216">        lineChartView.setBorderSpacing(Tools.fromDpToPx(10));</span>
+<span class="nc" id="L217">        lineChartView.setAxisBorderValues((int) minPressure - 1, (int) maxPressure + 1);</span>
+<span class="nc" id="L218">        lineChartView.setStep(2);</span>
+<span class="nc" id="L219">        lineChartView.setXAxis(false);</span>
+<span class="nc" id="L220">        lineChartView.setYAxis(false);</span>
+<span class="nc" id="L221">        lineChartView.setLabelsColor(Color.parseColor(labelColor));</span>
+
+<span class="nc" id="L223">        lineChartView.show();</span>
+<span class="nc" id="L224">    }</span>
+
+    private void windSpeedGraph() {
+<span class="nc" id="L227">        LineChartView lineChartView = findViewById(R.id.graph_windspeed);</span>
+<span class="nc" id="L228">        String graphLineColor = &quot;#efd214&quot;;</span>
+
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        if (darkTheme) {</span>
+<span class="nc" id="L231">            graphLineColor = &quot;#FFF600&quot;;</span>
+        }
+
+        // Data
+<span class="nc" id="L235">        LineSet dataset = new LineSet();</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        for (int i = 0; i &lt; weatherList.size(); i++) {</span>
+<span class="nc" id="L237">            float windSpeed = (float) UnitConvertor.convertWind(Float.parseFloat(weatherList.get(i).getWind()), sp);</span>
+
+<span class="nc bnc" id="L239" title="All 2 branches missed.">            if (windSpeed &lt; minWindSpeed) {</span>
+<span class="nc" id="L240">                minWindSpeed = windSpeed;</span>
+            }
+
+<span class="nc bnc" id="L243" title="All 2 branches missed.">            if (windSpeed &gt; maxWindSpeed) {</span>
+<span class="nc" id="L244">                maxWindSpeed = windSpeed;</span>
+            }
+
+<span class="nc" id="L247">            dataset.addPoint(getDateLabel(weatherList.get(i), i), windSpeed);</span>
+        }
+<span class="nc" id="L249">        dataset.setSmooth(false);</span>
+<span class="nc" id="L250">        dataset.setColor(Color.parseColor(graphLineColor));</span>
+<span class="nc" id="L251">        dataset.setThickness(4);</span>
+
+<span class="nc" id="L253">        lineChartView.addData(dataset);</span>
+
+        // Grid
+<span class="nc" id="L256">        Paint paint = new Paint();</span>
+<span class="nc" id="L257">        paint.setStyle(Paint.Style.STROKE);</span>
+<span class="nc" id="L258">        paint.setAntiAlias(true);</span>
+<span class="nc" id="L259">        paint.setColor(Color.parseColor(lineColor));</span>
+<span class="nc" id="L260">        paint.setPathEffect(new DashPathEffect(new float[]{10, 10}, 0));</span>
+<span class="nc" id="L261">        paint.setStrokeWidth(1);</span>
+<span class="nc" id="L262">        lineChartView.setGrid(ChartView.GridType.HORIZONTAL, paint);</span>
+<span class="nc" id="L263">        lineChartView.setBorderSpacing(Tools.fromDpToPx(10));</span>
+<span class="nc" id="L264">        lineChartView.setAxisBorderValues((int) minWindSpeed - 1, (int) maxWindSpeed + 1);</span>
+<span class="nc" id="L265">        lineChartView.setStep(2);</span>
+<span class="nc" id="L266">        lineChartView.setXAxis(false);</span>
+<span class="nc" id="L267">        lineChartView.setYAxis(false);</span>
+<span class="nc" id="L268">        lineChartView.setLabelsColor(Color.parseColor(labelColor));</span>
+
+<span class="nc" id="L270">        lineChartView.show();</span>
+<span class="nc" id="L271">    }</span>
+
+
+    public ParseResult parseLongTermJson(String result) {
+        int i;
+        try {
+<span class="nc" id="L277">            JSONObject reader = new JSONObject(result);</span>
+
+<span class="nc" id="L279">            final String code = reader.optString(&quot;cod&quot;);</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">            if (&quot;404&quot;.equals(code)) {</span>
+<span class="nc" id="L281">                return ParseResult.CITY_NOT_FOUND;</span>
+            }
+
+<span class="nc" id="L284">            JSONArray list = reader.getJSONArray(&quot;list&quot;);</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">            for (i = 0; i &lt; list.length(); i++) {</span>
+<span class="nc" id="L286">                Weather weather = new Weather();</span>
+
+<span class="nc" id="L288">                JSONObject listItem = list.getJSONObject(i);</span>
+<span class="nc" id="L289">                JSONObject main = listItem.getJSONObject(&quot;main&quot;);</span>
+
+<span class="nc" id="L291">                JSONObject windObj = listItem.optJSONObject(&quot;wind&quot;);</span>
+<span class="nc" id="L292">                weather.setWind(windObj.getString(&quot;speed&quot;));</span>
+
+<span class="nc" id="L294">                weather.setPressure(main.getString(&quot;pressure&quot;));</span>
+<span class="nc" id="L295">                weather.setHumidity(main.getString(&quot;humidity&quot;));</span>
+
+<span class="nc" id="L297">                JSONObject rainObj = listItem.optJSONObject(&quot;rain&quot;);</span>
+<span class="nc" id="L298">                JSONObject snowObj = listItem.optJSONObject(&quot;snow&quot;);</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">                if (rainObj != null) {</span>
+<span class="nc" id="L300">                    weather.setRain(MainActivity.getRainString(rainObj));</span>
+                } else {
+<span class="nc" id="L302">                    weather.setRain(MainActivity.getRainString(snowObj));</span>
+                }
+
+<span class="nc" id="L305">                weather.setDate(listItem.getString(&quot;dt&quot;));</span>
+<span class="nc" id="L306">                weather.setTemperature(main.getString(&quot;temp&quot;));</span>
+
+<span class="nc" id="L308">                weatherList.add(weather);</span>
+            }
+<span class="nc" id="L310">        } catch (JSONException e) {</span>
+<span class="nc" id="L311">            Log.e(&quot;JSONException Data&quot;, result);</span>
+<span class="nc" id="L312">            e.printStackTrace();</span>
+<span class="nc" id="L313">            return ParseResult.JSON_EXCEPTION;</span>
+<span class="nc" id="L314">        }</span>
+
+<span class="nc" id="L316">        return ParseResult.OK;</span>
+    }
+
+<span class="nc" id="L319">    String previous = &quot;&quot;;</span>
+
+    public String getDateLabel(Weather weather, int i) {
+<span class="nc bnc" id="L322" title="All 2 branches missed.">        if ((i + 4) % 4 == 0) {</span>
+<span class="nc" id="L323">            SimpleDateFormat resultFormat = new SimpleDateFormat(&quot;E&quot;);</span>
+<span class="nc" id="L324">            resultFormat.setTimeZone(TimeZone.getDefault());</span>
+<span class="nc" id="L325">            String output = resultFormat.format(weather.getDate());</span>
+<span class="nc bnc" id="L326" title="All 2 branches missed.">            if (!output.equals(previous)) {</span>
+<span class="nc" id="L327">                previous = output;</span>
+<span class="nc" id="L328">                return output;</span>
+            } else {
+<span class="nc" id="L330">                return &quot;&quot;;</span>
+            }
+        } else {
+<span class="nc" id="L333">            return &quot;&quot;;</span>
+        }
+    }
+
+    private int getTheme(String themePref) {
+<span class="nc bnc" id="L338" title="All 22 branches missed.">        switch (themePref) {</span>
+            case &quot;dark&quot;:
+<span class="nc" id="L340">                return R.style.AppTheme_NoActionBar_Dark;</span>
+            case &quot;black&quot;:
+<span class="nc" id="L342">                return R.style.AppTheme_NoActionBar_Black;</span>
+            case &quot;classic&quot;:
+<span class="nc" id="L344">                return R.style.AppTheme_NoActionBar_Classic;</span>
+            case &quot;classicdark&quot;:
+<span class="nc" id="L346">                return R.style.AppTheme_NoActionBar_Classic_Dark;</span>
+            case &quot;classicblack&quot;:
+<span class="nc" id="L348">                return R.style.AppTheme_NoActionBar_Classic_Black;</span>
+            default:
+<span class="nc" id="L350">                return R.style.AppTheme_NoActionBar;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.4.1</div></body></html>

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Weather.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie.models</a> &gt; <span class="el_source">Weather.java</span></div><h1>Weather.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie.models;
+
+import android.content.Context;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+import cz.martykan.forecastie.R;
+
+<span class="fc" id="L13">public class Weather {</span>
+
+    private String city;
+    private String country;
+    private Date date;
+    private String temperature;
+    private String description;
+    private String wind;
+    private Double windDirectionDegree;
+    private String pressure;
+    private String humidity;
+    private String rain;
+    private String id;
+    private String icon;
+    private String lastUpdated;
+    private Date sunrise;
+    private Date sunset;
+    private double lat;
+    private double lon;
+    private double uvIndex;
+
+<span class="fc" id="L34">    public enum WindDirection {</span>
+        // don't change order
+<span class="fc" id="L36">        NORTH, NORTH_NORTH_EAST, NORTH_EAST, EAST_NORTH_EAST,</span>
+<span class="fc" id="L37">        EAST, EAST_SOUTH_EAST, SOUTH_EAST, SOUTH_SOUTH_EAST,</span>
+<span class="fc" id="L38">        SOUTH, SOUTH_SOUTH_WEST, SOUTH_WEST, WEST_SOUTH_WEST,</span>
+<span class="fc" id="L39">        WEST, WEST_NORTH_WEST, NORTH_WEST, NORTH_NORTH_WEST;</span>
+
+        public static WindDirection byDegree(double degree) {
+<span class="nc" id="L42">            return byDegree(degree, WindDirection.values().length);</span>
+        }
+
+        public static WindDirection byDegree(double degree, int numberOfDirections) {
+<span class="fc" id="L46">            WindDirection[] directions = WindDirection.values();</span>
+<span class="fc" id="L47">            int availableNumberOfDirections = directions.length;</span>
+
+<span class="fc" id="L49">            int direction = windDirectionDegreeToIndex(degree, numberOfDirections)</span>
+                    * availableNumberOfDirections / numberOfDirections;
+
+<span class="fc" id="L52">            return directions[direction];</span>
+        }
+
+        public String getLocalizedString(Context context) {
+            // usage of enum.ordinal() is not recommended, but whatever
+<span class="nc" id="L57">            return context.getResources().getStringArray(R.array.windDirections)[ordinal()];</span>
+        }
+
+        public String getArrow(Context context) {
+            // usage of enum.ordinal() is not recommended, but whatever
+<span class="fc" id="L62">            return context.getResources().getStringArray(R.array.windDirectionArrows)[ordinal() / 2];</span>
+        }
+    }
+
+    // you may use values like 4, 8, etc. for numberOfDirections
+    public static int windDirectionDegreeToIndex(double degree, int numberOfDirections) {
+        // to be on the safe side
+<span class="fc" id="L69">        degree %= 360;</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if(degree &lt; 0) degree += 360;</span>
+
+<span class="fc" id="L72">        degree += 180 / numberOfDirections; // add offset to make North start from 0</span>
+
+<span class="fc" id="L74">        int direction = (int)Math.floor(degree * numberOfDirections / 360);</span>
+
+<span class="fc" id="L76">        return direction % numberOfDirections;</span>
+    }
+
+    public String getCity() {
+<span class="fc" id="L80">        return city;</span>
+    }
+
+    public void setCity(String city) {
+<span class="fc" id="L84">        this.city = city;</span>
+<span class="fc" id="L85">    }</span>
+
+    public String getCountry() {
+<span class="fc" id="L88">        return country;</span>
+    }
+
+    public void setCountry(String country) {
+<span class="fc" id="L92">        this.country = country;</span>
+<span class="fc" id="L93">    }</span>
+
+    public String getTemperature() {
+<span class="fc" id="L96">        return temperature;</span>
+    }
+
+    public void setTemperature(String temperature) {
+<span class="fc" id="L100">        this.temperature = temperature;</span>
+<span class="fc" id="L101">    }</span>
+
+
+    public String getDescription() {
+<span class="fc" id="L105">        return description;</span>
+    }
+
+    public void setDescription(String description) {
+<span class="fc" id="L109">        this.description = description;</span>
+<span class="fc" id="L110">    }</span>
+
+
+    public String getWind() {
+<span class="fc" id="L114">        return wind;</span>
+    }
+
+    public void setWind(String wind) {
+<span class="fc" id="L118">        this.wind = wind;</span>
+<span class="fc" id="L119">    }</span>
+
+    public Double getWindDirectionDegree() {
+<span class="nc" id="L122">        return windDirectionDegree;</span>
+    }
+
+    public void setWindDirectionDegree(Double windDirectionDegree) {
+<span class="fc" id="L126">        this.windDirectionDegree = windDirectionDegree;</span>
+<span class="fc" id="L127">    }</span>
+
+    public WindDirection getWindDirection() {
+<span class="nc" id="L130">        return WindDirection.byDegree(windDirectionDegree);</span>
+    }
+
+    public WindDirection getWindDirection(int numberOfDirections) {
+<span class="fc" id="L134">        return WindDirection.byDegree(windDirectionDegree, numberOfDirections);</span>
+    }
+
+    public boolean isWindDirectionAvailable() {
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        return windDirectionDegree != null;</span>
+    }
+
+    public String getPressure() {
+<span class="fc" id="L142">        return pressure;</span>
+    }
+
+    public void setPressure(String pressure) {
+<span class="fc" id="L146">        this.pressure = pressure;</span>
+<span class="fc" id="L147">    }</span>
+
+    public String getHumidity() {
+<span class="fc" id="L150">        return humidity;</span>
+    }
+
+    public void setHumidity(String humidity) {
+<span class="fc" id="L154">        this.humidity = humidity;</span>
+<span class="fc" id="L155">    }</span>
+
+    public Date getSunrise(){
+<span class="fc" id="L158">        return this.sunrise;</span>
+    }
+
+    public void setSunrise(String dateString) {
+        try {
+<span class="fc" id="L163">            setSunrise(new Date(Long.parseLong(dateString) * 1000));</span>
+        }
+<span class="nc" id="L165">        catch (Exception e) {</span>
+<span class="nc" id="L166">            SimpleDateFormat inputFormat = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;, Locale.ENGLISH);</span>
+            try {
+<span class="nc" id="L168">                setSunrise(inputFormat.parse(dateString));</span>
+            }
+<span class="nc" id="L170">            catch (ParseException e2) {</span>
+<span class="nc" id="L171">                setSunrise(new Date()); // make the error somewhat obvious</span>
+<span class="nc" id="L172">                e2.printStackTrace();</span>
+<span class="nc" id="L173">            }</span>
+<span class="fc" id="L174">        }</span>
+<span class="fc" id="L175">    }</span>
+
+    public void setSunrise(Date date) {
+<span class="fc" id="L178">        this.sunrise = date;</span>
+<span class="fc" id="L179">    }</span>
+
+    public Date getSunset(){
+<span class="fc" id="L182">        return this.sunset;</span>
+    }
+
+    public void setSunset(String dateString) {
+        try {
+<span class="fc" id="L187">            setSunset(new Date(Long.parseLong(dateString) * 1000));</span>
+        }
+<span class="nc" id="L189">        catch (Exception e) {</span>
+<span class="nc" id="L190">            SimpleDateFormat inputFormat = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;, Locale.ENGLISH);</span>
+            try {
+<span class="nc" id="L192">                setSunrise(inputFormat.parse(dateString));</span>
+            }
+<span class="nc" id="L194">            catch (ParseException e2) {</span>
+<span class="nc" id="L195">                setSunset(new Date()); // make the error somewhat obvious</span>
+<span class="nc" id="L196">                e2.printStackTrace();</span>
+<span class="nc" id="L197">            }</span>
+<span class="fc" id="L198">        }</span>
+<span class="fc" id="L199">    }</span>
+
+    public void setSunset(Date date) {
+<span class="fc" id="L202">        this.sunset = date;</span>
+<span class="fc" id="L203">    }</span>
+
+<span class="fc" id="L205">    public void setLat(double lat) {this.lat = lat; }</span>
+
+<span class="fc" id="L207">    public double getLat() { return this.lat; }</span>
+
+<span class="fc" id="L209">    public void setLon(double lon) { this.lon = lon; }</span>
+
+<span class="fc" id="L211">    public double getLon() { return this.lon; }</span>
+
+<span class="fc" id="L213">    public double getUvIndex() { return this.uvIndex; }</span>
+
+<span class="nc" id="L215">    public void setUvIndex(double uvIndex) { this.uvIndex = uvIndex; }</span>
+
+    public String getIcon() {
+<span class="fc" id="L218">        return icon;</span>
+    }
+
+    public void setIcon(String icon) {
+<span class="fc" id="L222">        this.icon = icon;</span>
+<span class="fc" id="L223">    }</span>
+
+    public Date getDate(){
+<span class="fc" id="L226">        return this.date;</span>
+    }
+
+    public void setDate(String dateString) {
+        try {
+<span class="fc" id="L231">            setDate(new Date(Long.parseLong(dateString) * 1000));</span>
+        }
+<span class="nc" id="L233">        catch (Exception e) {</span>
+<span class="nc" id="L234">            SimpleDateFormat inputFormat = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;, Locale.ENGLISH);</span>
+            try {
+<span class="nc" id="L236">                setDate(inputFormat.parse(dateString));</span>
+            }
+<span class="nc" id="L238">            catch (ParseException e2) {</span>
+<span class="nc" id="L239">                setDate(new Date()); // make the error somewhat obvious</span>
+<span class="nc" id="L240">                e2.printStackTrace();</span>
+<span class="nc" id="L241">            }</span>
+<span class="fc" id="L242">        }</span>
+<span class="fc" id="L243">    }</span>
+
+    public void setDate(Date date) {
+<span class="fc" id="L246">        this.date = date;</span>
+<span class="fc" id="L247">    }</span>
+
+    public long getNumDaysFrom(Date initialDate) {
+<span class="nc" id="L250">        Calendar initial = Calendar.getInstance();</span>
+<span class="nc" id="L251">        initial.setTime(initialDate);</span>
+<span class="nc" id="L252">        initial.set(Calendar.MILLISECOND, 0);</span>
+<span class="nc" id="L253">        initial.set(Calendar.SECOND, 0);</span>
+<span class="nc" id="L254">        initial.set(Calendar.MINUTE, 0);</span>
+<span class="nc" id="L255">        initial.set(Calendar.HOUR_OF_DAY, 0);</span>
+
+<span class="nc" id="L257">        Calendar me = Calendar.getInstance();</span>
+<span class="nc" id="L258">        me.setTime(this.date);</span>
+<span class="nc" id="L259">        me.set(Calendar.MILLISECOND, 0);</span>
+<span class="nc" id="L260">        me.set(Calendar.SECOND, 0);</span>
+<span class="nc" id="L261">        me.set(Calendar.MINUTE, 0);</span>
+<span class="nc" id="L262">        me.set(Calendar.HOUR_OF_DAY, 0);</span>
+
+<span class="nc" id="L264">        return Math.round((me.getTimeInMillis() - initial.getTimeInMillis()) / 86400000.0);</span>
+    }
+
+    public String getId() {
+<span class="nc" id="L268">        return id;</span>
+    }
+
+    public void setId(String id) {
+<span class="fc" id="L272">        this.id = id;</span>
+<span class="fc" id="L273">    }</span>
+
+    public String getRain() {
+<span class="fc" id="L276">        return rain;</span>
+    }
+
+    public void setRain(String rain) {
+<span class="fc" id="L280">        this.rain = rain;</span>
+<span class="fc" id="L281">    }</span>
+
+    public void setLastUpdated(String lastUpdated) {
+<span class="nc" id="L284">        this.lastUpdated = lastUpdated;</span>
+<span class="nc" id="L285">    }</span>
+
+    public String getLastUpdated() {
+<span class="nc" id="L288">        return lastUpdated;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

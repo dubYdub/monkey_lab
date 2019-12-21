@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AlarmReceiver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">cz.martykan.forecastie</a> &gt; <span class="el_source">AlarmReceiver.java</span></div><h1>AlarmReceiver.java</h1><pre class="source lang-java linenums">package cz.martykan.forecastie;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Locale;
+
+import cz.martykan.forecastie.activities.MainActivity;
+import cz.martykan.forecastie.widgets.AbstractWidgetProvider;
+import cz.martykan.forecastie.widgets.DashClockWeatherExtension;
+
+<span class="nc" id="L35">public class AlarmReceiver extends BroadcastReceiver {</span>
+
+    Context context;
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+<span class="nc" id="L41">        this.context = context;</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {</span>
+<span class="nc" id="L43">            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);</span>
+<span class="nc" id="L44">            String interval = sp.getString(&quot;refreshInterval&quot;, &quot;1&quot;);</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">            if (!interval.equals(&quot;0&quot;)) {</span>
+<span class="nc" id="L46">                setRecurringAlarm(context);</span>
+<span class="nc" id="L47">                getWeather();</span>
+            }
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {</span>
+            // Get weather if last attempt failed or if 'update location in background' is activated
+<span class="nc" id="L51">            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);</span>
+<span class="nc" id="L52">            String interval = sp.getString(&quot;refreshInterval&quot;, &quot;1&quot;);</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">            if (!interval.equals(&quot;0&quot;) &amp;&amp;</span>
+<span class="nc bnc" id="L54" title="All 4 branches missed.">                    (sp.getBoolean(&quot;backgroundRefreshFailed&quot;, false) || isUpdateLocation())) {</span>
+<span class="nc" id="L55">                getWeather();</span>
+            }
+<span class="nc" id="L57">        } else {</span>
+<span class="nc" id="L58">            getWeather();</span>
+        }
+<span class="nc" id="L60">    }</span>
+
+    private void getWeather() {
+<span class="nc" id="L63">        Log.d(&quot;Alarm&quot;, &quot;Recurring alarm; requesting download service.&quot;);</span>
+        boolean failed;
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (isNetworkAvailable()) {</span>
+<span class="nc" id="L66">            failed = false;</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            if (isUpdateLocation()) {</span>
+<span class="nc" id="L68">                new GetLocationAndWeatherTask().execute(); // This method calls the two methods below once it has determined a location</span>
+            } else {
+<span class="nc" id="L70">                new GetWeatherTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);</span>
+<span class="nc" id="L71">                new GetLongTermWeatherTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);</span>
+            }
+        } else {
+<span class="nc" id="L74">            failed = true;</span>
+        }
+<span class="nc" id="L76">        SharedPreferences.Editor editor =</span>
+<span class="nc" id="L77">                PreferenceManager.getDefaultSharedPreferences(context).edit();</span>
+<span class="nc" id="L78">        editor.putBoolean(&quot;backgroundRefreshFailed&quot;, failed);</span>
+<span class="nc" id="L79">        editor.apply();</span>
+<span class="nc" id="L80">    }</span>
+
+    private boolean isNetworkAvailable() {
+<span class="nc" id="L83">        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);</span>
+<span class="nc" id="L84">        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();</span>
+<span class="nc bnc" id="L85" title="All 4 branches missed.">        return activeNetworkInfo != null &amp;&amp; activeNetworkInfo.isConnected();</span>
+    }
+
+    private boolean isUpdateLocation() {
+<span class="nc" id="L89">        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);</span>
+<span class="nc" id="L90">        return preferences.getBoolean(&quot;updateLocationAutomatically&quot;, false);</span>
+    }
+
+<span class="nc" id="L93">    public class GetWeatherTask extends AsyncTask&lt;String, String, Void&gt; {</span>
+
+        protected void onPreExecute() {
+
+<span class="nc" id="L97">        }</span>
+
+        @Override
+        protected Void doInBackground(String... params) {
+            try {
+<span class="nc" id="L102">                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);</span>
+<span class="nc" id="L103">                String language = Locale.getDefault().getLanguage();</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                if(language.equals(&quot;cs&quot;)) { language = &quot;cz&quot;; }</span>
+<span class="nc" id="L105">                String apiKey = sp.getString(&quot;apiKey&quot;, context.getResources().getString(R.string.apiKey));</span>
+<span class="nc" id="L106">                URL url = new URL(&quot;https://api.openweathermap.org/data/2.5/weather?id=&quot; + URLEncoder.encode(sp.getString(&quot;cityId&quot;, Constants.DEFAULT_CITY_ID), &quot;UTF-8&quot;) + &quot;&amp;lang=&quot;+ language +&quot;&amp;appid=&quot; + apiKey);</span>
+<span class="nc" id="L107">                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L108">                BufferedReader connectionBufferedReader = null;</span>
+                try {
+<span class="nc" id="L110">                    connectionBufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">                    if (urlConnection.getResponseCode() == 200) {</span>
+<span class="nc" id="L112">                        StringBuilder result = new StringBuilder();</span>
+                        String line;
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                        while ((line = connectionBufferedReader.readLine()) != null) {</span>
+<span class="nc" id="L115">                            result.append(line).append(&quot;\n&quot;);</span>
+                        }
+<span class="nc" id="L117">                        SharedPreferences.Editor editor = sp.edit();</span>
+<span class="nc" id="L118">                        editor.putString(&quot;lastToday&quot;, result.toString());</span>
+<span class="nc" id="L119">                        editor.apply();</span>
+<span class="nc" id="L120">                        MainActivity.saveLastUpdateTime(sp);</span>
+                    } else {
+                        // Connection problem
+                    }
+                } finally {
+<span class="nc bnc" id="L125" title="All 2 branches missed.">                    if (connectionBufferedReader != null) connectionBufferedReader.close();</span>
+                }
+<span class="nc" id="L127">            } catch (IOException e) {</span>
+                // No connection
+<span class="nc" id="L129">            }</span>
+<span class="nc" id="L130">            return null;</span>
+        }
+
+        protected void onPostExecute(Void v) {
+            // Update widgets
+<span class="nc" id="L135">            AbstractWidgetProvider.updateWidgets(context);</span>
+<span class="nc" id="L136">            DashClockWeatherExtension.updateDashClock(context);</span>
+<span class="nc" id="L137">        }</span>
+    }
+
+<span class="nc" id="L140">    class GetLongTermWeatherTask extends AsyncTask&lt;String, String, Void&gt; {</span>
+
+        protected void onPreExecute() {
+
+<span class="nc" id="L144">        }</span>
+
+        @Override
+        protected Void doInBackground(String... params) {
+            try {
+<span class="nc" id="L149">                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);</span>
+<span class="nc" id="L150">                String language = Locale.getDefault().getLanguage();</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">                if(language.equals(&quot;cs&quot;)) { language = &quot;cz&quot;; }</span>
+<span class="nc" id="L152">                String apiKey = sp.getString(&quot;apiKey&quot;, context.getResources().getString(R.string.apiKey));</span>
+<span class="nc" id="L153">                URL url = new URL(&quot;https://api.openweathermap.org/data/2.5/forecast?id=&quot; + URLEncoder.encode(sp.getString(&quot;cityId&quot;, Constants.DEFAULT_CITY_ID), &quot;UTF-8&quot;) + &quot;&amp;lang=&quot;+ language +&quot;&amp;mode=json&amp;appid=&quot; + apiKey);</span>
+<span class="nc" id="L154">                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L155">                BufferedReader connectionBufferedReader = null;</span>
+                try {
+<span class="nc" id="L157">                    connectionBufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">                    if (urlConnection.getResponseCode() == 200) {</span>
+<span class="nc" id="L159">                        StringBuilder result = new StringBuilder();</span>
+                        String line;
+<span class="nc bnc" id="L161" title="All 2 branches missed.">                        while ((line = connectionBufferedReader.readLine()) != null) {</span>
+<span class="nc" id="L162">                            result.append(line).append(&quot;\n&quot;);</span>
+                        }
+<span class="nc" id="L164">                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();</span>
+<span class="nc" id="L165">                        editor.putString(&quot;lastLongterm&quot;, result.toString());</span>
+<span class="nc" id="L166">                        editor.apply();</span>
+                    } else {
+                        // Connection problem
+                    }
+                } finally {
+<span class="nc bnc" id="L171" title="All 2 branches missed.">                    if (connectionBufferedReader != null) connectionBufferedReader.close();</span>
+                }
+<span class="nc" id="L173">            } catch (IOException e) {</span>
+                // No connection
+<span class="nc" id="L175">            }</span>
+<span class="nc" id="L176">            return null;</span>
+        }
+
+        protected void onPostExecute(Void v) {
+
+<span class="nc" id="L181">        }</span>
+    }
+
+<span class="nc" id="L184">    public class GetLocationAndWeatherTask extends AsyncTask &lt;String, String, Void&gt; {</span>
+        private static final String TAG = &quot;LocationAndWTask&quot;;
+
+<span class="nc" id="L187">        private final double MAX_RUNNING_TIME = 30 * 1000;</span>
+
+        private LocationManager locationManager;
+        private BackgroundLocationListener locationListener;
+
+        @Override
+        protected void onPreExecute() {
+<span class="nc" id="L194">            Log.d(TAG, &quot;Trying to determine location...&quot;);</span>
+<span class="nc" id="L195">            locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);</span>
+<span class="nc" id="L196">            locationListener = new BackgroundLocationListener();</span>
+            try {
+<span class="nc bnc" id="L198" title="All 2 branches missed.">                if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {</span>
+                    // Only uses 'network' location, as asking the GPS every time would drain too much battery
+<span class="nc" id="L200">                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);</span>
+                } else {
+<span class="nc" id="L202">                    Log.d(TAG, &quot;'Network' location is not enabled. Cancelling determining location.&quot;);</span>
+<span class="nc" id="L203">                    onPostExecute(null);</span>
+                }
+<span class="nc" id="L205">            } catch (SecurityException e) {</span>
+<span class="nc" id="L206">                Log.e(TAG, &quot;Couldn't request location updates. Probably this is an Android (&gt;M) runtime permissions issue &quot;, e);</span>
+<span class="nc" id="L207">            }</span>
+<span class="nc" id="L208">        }</span>
+
+        @Override
+        protected Void doInBackground(String... params) {
+<span class="nc" id="L212">            long startTime = System.currentTimeMillis();</span>
+<span class="nc" id="L213">            long runningTime = 0;</span>
+<span class="nc bnc" id="L214" title="All 4 branches missed.">            while (locationListener.getLocation() == null &amp;&amp; runningTime &lt; MAX_RUNNING_TIME) { // Give up after 30 seconds</span>
+                try {
+<span class="nc" id="L216">                    Thread.sleep(100);</span>
+<span class="nc" id="L217">                } catch (InterruptedException e) {</span>
+<span class="nc" id="L218">                    Log.e(TAG, &quot;Error occurred while waiting for location update&quot;, e);</span>
+<span class="nc" id="L219">                }</span>
+<span class="nc" id="L220">                runningTime = System.currentTimeMillis() - startTime;</span>
+            }
+<span class="nc bnc" id="L222" title="All 2 branches missed.">            if (locationListener.getLocation() == null) {</span>
+<span class="nc" id="L223">                Log.d(TAG, String.format(&quot;Couldn't determine location in less than %s seconds&quot;, MAX_RUNNING_TIME / 1000));</span>
+            }
+<span class="nc" id="L225">            return null;</span>
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+<span class="nc" id="L230">            Location location = locationListener.getLocation();</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">            if (location != null) {</span>
+<span class="nc" id="L232">                Log.d(TAG, String.format(&quot;Determined location: latitude %f - longitude %f&quot;, location.getLatitude(), location.getLongitude()));</span>
+<span class="nc" id="L233">                new GetCityNameTask().execute(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude()));</span>
+            } else {
+<span class="nc" id="L235">                Log.e(TAG, &quot;Couldn't determine location. Using last known location.&quot;);</span>
+<span class="nc" id="L236">                new GetWeatherTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);</span>
+<span class="nc" id="L237">                new GetLongTermWeatherTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);</span>
+            }
+            try {
+<span class="nc" id="L240">                locationManager.removeUpdates(locationListener);</span>
+<span class="nc" id="L241">            } catch (SecurityException e) {</span>
+<span class="nc" id="L242">                Log.e(TAG, &quot;Couldn't remove location updates. Probably this is an Android (&gt;M) runtime permissions&quot;, e);</span>
+<span class="nc" id="L243">            }</span>
+<span class="nc" id="L244">        }</span>
+
+<span class="nc" id="L246">        public class BackgroundLocationListener implements LocationListener {</span>
+            private static final String TAG = &quot;LocationListener&quot;;
+            private Location location;
+
+            @Override
+            public void onLocationChanged(Location location) {
+<span class="nc" id="L252">                this.location = location;</span>
+<span class="nc" id="L253">            }</span>
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+<span class="nc" id="L258">            }</span>
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+<span class="nc" id="L263">            }</span>
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+<span class="nc" id="L268">            }</span>
+
+            public Location getLocation() {
+<span class="nc" id="L271">                return location;</span>
+            }
+        }
+    }
+
+<span class="nc" id="L276">    public class GetCityNameTask extends AsyncTask &lt;String, String, Void&gt; {</span>
+        private static final String TAG = &quot;GetCityNameTask&quot;;
+
+        @Override
+        protected Void doInBackground(String... params) {
+<span class="nc" id="L281">            String lat = params[0];</span>
+<span class="nc" id="L282">            String lon = params[1];</span>
+
+<span class="nc" id="L284">            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);</span>
+<span class="nc" id="L285">            String language = Locale.getDefault().getLanguage();</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">            if(language.equals(&quot;cs&quot;)) {</span>
+<span class="nc" id="L287">                language = &quot;cz&quot;;</span>
+            }
+<span class="nc" id="L289">            String apiKey = sp.getString(&quot;apiKey&quot;, context.getResources().getString(R.string.apiKey));</span>
+
+            try {
+<span class="nc" id="L292">                URL url = new URL(&quot;https://api.openweathermap.org/data/2.5/weather?q=&amp;lat=&quot; + lat + &quot;&amp;lon=&quot; + lon + &quot;&amp;lang=&quot;+ language +&quot;&amp;appid=&quot; + apiKey);</span>
+<span class="nc" id="L293">                Log.d(TAG, &quot;Request: &quot; + url.toString());</span>
+
+<span class="nc" id="L295">                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();</span>
+
+<span class="nc bnc" id="L297" title="All 2 branches missed.">                if (urlConnection.getResponseCode() == 200) {</span>
+<span class="nc" id="L298">                    BufferedReader connectionBufferedReader = null;</span>
+                    try {
+<span class="nc" id="L300">                        connectionBufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));</span>
+<span class="nc" id="L301">                        StringBuilder result = new StringBuilder();</span>
+                        String line;
+<span class="nc bnc" id="L303" title="All 2 branches missed.">                        while ((line = connectionBufferedReader.readLine()) != null) {</span>
+<span class="nc" id="L304">                            result.append(line).append(&quot;\n&quot;);</span>
+                        }
+<span class="nc" id="L306">                        Log.d(TAG, &quot;JSON Result: &quot; + result);</span>
+<span class="nc" id="L307">                        JSONObject reader = new JSONObject(result.toString());</span>
+<span class="nc" id="L308">                        String cityId = reader.getString(&quot;id&quot;);</span>
+<span class="nc" id="L309">                        String city = reader.getString(&quot;name&quot;);</span>
+<span class="nc" id="L310">                        String country = &quot;&quot;;</span>
+<span class="nc" id="L311">                        JSONObject countryObj = reader.optJSONObject(&quot;sys&quot;);</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">                        if (countryObj != null) {</span>
+<span class="nc" id="L313">                            country = &quot;, &quot; + countryObj.getString(&quot;country&quot;);</span>
+                        }
+<span class="nc" id="L315">                        Log.d(TAG, &quot;City: &quot; + city + country);</span>
+<span class="nc" id="L316">                        String lastCity = PreferenceManager.getDefaultSharedPreferences(context).getString(&quot;city&quot;, &quot;&quot;);</span>
+<span class="nc" id="L317">                        String currentCity = city + country;</span>
+<span class="nc" id="L318">                        SharedPreferences.Editor editor = sp.edit();</span>
+<span class="nc" id="L319">                        editor.putString(&quot;cityId&quot;, cityId);</span>
+<span class="nc" id="L320">                        editor.putString(&quot;city&quot;, currentCity);</span>
+<span class="nc bnc" id="L321" title="All 2 branches missed.">                        editor.putBoolean(&quot;cityChanged&quot;, !currentCity.equals(lastCity));</span>
+<span class="nc" id="L322">                        editor.commit();</span>
+
+<span class="nc" id="L324">                    } catch (JSONException e){</span>
+<span class="nc" id="L325">                        Log.e(TAG, &quot;An error occurred while reading the JSON object&quot;, e);</span>
+                    } finally {
+<span class="nc bnc" id="L327" title="All 2 branches missed.">                        if (connectionBufferedReader != null) connectionBufferedReader.close();</span>
+                    }
+<span class="nc" id="L329">                } else {</span>
+<span class="nc" id="L330">                    Log.e(TAG, &quot;Error: Response code &quot; + urlConnection.getResponseCode());</span>
+                }
+<span class="nc" id="L332">            } catch (IOException e) {</span>
+<span class="nc" id="L333">                Log.e(TAG, &quot;Connection error&quot;, e);</span>
+<span class="nc" id="L334">            }</span>
+<span class="nc" id="L335">            return null;</span>
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+<span class="nc" id="L340">            new GetWeatherTask().execute();</span>
+<span class="nc" id="L341">            new GetLongTermWeatherTask().execute();</span>
+<span class="nc" id="L342">        }</span>
+    }
+
+    private static long intervalMillisForRecurringAlarm(String intervalPref) {
+<span class="fc" id="L346">        int interval = Integer.parseInt(intervalPref);</span>
+<span class="pc bpc" id="L347" title="6 of 7 branches missed.">        switch (interval) {</span>
+            case 0:
+<span class="nc" id="L349">                return 0; // special case for cancel</span>
+            case 15:
+<span class="nc" id="L351">                return AlarmManager.INTERVAL_FIFTEEN_MINUTES;</span>
+            case 30:
+<span class="nc" id="L353">                return AlarmManager.INTERVAL_HALF_HOUR;</span>
+            case 1:
+<span class="fc" id="L355">                return AlarmManager.INTERVAL_HOUR;</span>
+            case 12:
+<span class="nc" id="L357">                return AlarmManager.INTERVAL_HALF_DAY;</span>
+            case 24:
+<span class="nc" id="L359">                return AlarmManager.INTERVAL_DAY;</span>
+            default: // cases 2 and 6 (or any number of hours)
+<span class="nc" id="L361">                return interval * 3600000;</span>
+        }
+    }
+
+    public static void setRecurringAlarm(Context context) {
+<span class="fc" id="L366">        String intervalPref = PreferenceManager.getDefaultSharedPreferences(context)</span>
+<span class="fc" id="L367">                .getString(&quot;refreshInterval&quot;, &quot;1&quot;);</span>
+<span class="fc" id="L368">        Intent refresh = new Intent(context, AlarmReceiver.class);</span>
+<span class="fc" id="L369">        PendingIntent recurringRefresh = PendingIntent.getBroadcast(context,</span>
+                0, refresh, PendingIntent.FLAG_CANCEL_CURRENT);
+<span class="fc" id="L371">        AlarmManager alarms = (AlarmManager) context.getSystemService(</span>
+                Context.ALARM_SERVICE);
+<span class="fc" id="L373">        long intervalMillis = intervalMillisForRecurringAlarm(intervalPref);</span>
+<span class="pc bpc" id="L374" title="1 of 2 branches missed.">        if (intervalMillis == 0) {</span>
+            // Cancel previous alarm
+<span class="nc" id="L376">            alarms.cancel(recurringRefresh);</span>
+        } else {
+<span class="fc" id="L378">            alarms.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,</span>
+<span class="fc" id="L379">                    SystemClock.elapsedRealtime() + intervalMillis,</span>
+                    intervalMillis,
+                    recurringRefresh);
+        }
+<span class="fc" id="L383">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
