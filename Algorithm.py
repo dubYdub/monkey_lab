@@ -1,22 +1,23 @@
 # coding=utf-8
 import random
-import time
 import string
 import os
-import subprocess
 import xml.etree.ElementTree as ET
+import math
 
-
-# 全局唯一标识
+# global
 unique_id = 1
+states = []
+
 
 class Event:
-    def __init__(self,event_type, widget_index, bounds):
+    def __init__(self, event_type, widget_index, bounds):
         self.event_type = event_type
         self.widget_index = widget_index
         # self.widget = widget
         self.bounds = bounds
         self.Q_value = 500
+        self.visited_counter = 1
 
 
 class State:
@@ -39,13 +40,12 @@ class State:
                 single_event = Event("long_click", widget_index, widgets[widget_index][3]['bounds'])
                 self.events.append(single_event)
             if widgets[widget_index][3]['scrollable'] == 'true':
-                single_event = Event("vertical_scroll",widget_index, widgets[widget_index][3]['bounds'])
+                single_event = Event("vertical_scroll", widget_index, widgets[widget_index][3]['bounds'])
                 self.events.append(single_event)
-                single_event = Event("horizontal_scroll",widget_index, widgets[widget_index][3]['bounds'])
+                single_event = Event("horizontal_scroll", widget_index, widgets[widget_index][3]['bounds'])
                 self.events.append(single_event)
 
 
-# [48,1427][266,1492]
 def handle_bounds(bounds):
     tmp = bounds.partition('][')
     list1 = tmp[0]
@@ -66,16 +66,16 @@ def event_execute(event):
     y = (y1 + y2) / 2
     if event.event_type == "click":
         os.system("adb shell input tap " + str(x) + " " + str(y))
-    elif event.event_type == "write" :
+    elif event.event_type == "write":
         random_str = ''.join(random.sample(string.ascii_letters + string.digits, 5))
         os.system("adb shell input text" + " " + random_str)
-    elif event.event_type == "long_click" :
+    elif event.event_type == "long_click":
         os.system("adb shell input swipe" + " " + str(x) + " " + str(y) + " " + str(x + 1) + " " + str(y + 1)
                   + " " + "1000")
-    elif event.event_type == "vertical_scroll" :
+    elif event.event_type == "vertical_scroll":
         os.system("adb shell input swipe" + " " + str(x) + " " + str(y) + " " + str(x) + " " + str(event.widget.y2) +
                   " " + "500")
-    elif event.event_type == "horizontal_scroll" :
+    elif event.event_type == "horizontal_scroll":
         os.system("adb shell input swipe" + " " + str(x) + " " + str(y) + " " + str(event.widget.x2) + " " + str(y) +
                   " " + "500")
 
@@ -88,17 +88,17 @@ def create_xml():
     os.system("adb pull /sdcard/cur_state.xml")
 
 
-def walkData(root_node, level,required_list):
+def walkData(root_node, level, required_list):
     global unique_id
     unique_id += 1
-    # 遍历每个子节点
+    # transverse every single node
     children_node = root_node.getchildren()
     if len(children_node) == 0:
         temp_list = [unique_id, level, root_node.tag, root_node.attrib]
         required_list.append(temp_list)
         return
     for child in children_node:
-        walkData(child, level + 1,required_list)
+        walkData(child, level + 1, required_list)
     return
 
 
@@ -106,98 +106,78 @@ def get_xml_data(file_name):
     level = 1  # depth of 1
     required_list = []
     root = ET.parse(file_name).getroot()
-    walkData(root, level,required_list)
+    walkData(root, level, required_list)
     return required_list
 
 
-def judge_diff(state1,state2):
+def judge_diff(state1, state2):
     if len(state1.widgets) == len(state2.widgets):
         for index in range(len(state1.widgets)):
-            if state1.widgets[index][0] != state2.widgets[index][0] or state1.widgets[index][1] != state2.widgets[index][1]:
+            if state1.widgets[index][0] != state2.widgets[index][0] or state1.widgets[index][1] != \
+                    state2.widgets[index][1]:
                 return False
         return True
-    else :
+    else:
         return False
 
 
+def create_state():
+    global states
+    single_state = State()
+    create_xml()
+    single_state.widgets = get_xml_data("cur_state.xml")
+
+    # judge if cur_state is in states
+    flag = False
+    single_index = -1
+    for state_index in range(0, len(states)):
+        if judge_diff(states[state_index], single_state):
+            flag = True
+            single_index = state_index
+            break
+    if not flag:
+        states.append(single_state)
+        single_index = len(states) - 1
+        states[single_index].create_events()
+    return single_index
+
+
+def select_best_event(state_index):
+    global states
+    cur_state = states[state_index]
+    max_Q_value = 0
+    selected_event_index = -1
+    for event_index in range(len(cur_state.events)):
+        if cur_state.events[event_index].Q_value > max_Q_value:
+            max_Q_value = cur_state.events[event_index].Q_value
+            selected_event_index = event_index
+    return selected_event_index
+
+
+def cal_discount(event_num):
+    # 0.9 × e−0.1×(|E |−1)
+    return 0.9 * math.e ** (event_num - 1)
+
+
 if __name__ == '__main__':
+    # global states
     # current state
-    states = []
-    # while True:
     for i in range(2):
-        print(1)
-        cur_state = State()
-        create_xml()
-        cur_widgets = get_xml_data("cur_state.xml")
-        cur_state.widgets = cur_widgets
-
-        # judge if cur_state is in states
-        flag = False
-        cur_index = -1
-        for state_index in range(0,len(states)):
-            if judge_diff(states[state_index], cur_state):
-                flag = True
-                cur_index = state_index
-                break
-        if flag:
-            # index_ifexist is used
-            i = 0
-            # event
-            # states[cur_index].events
-        else:
-            # print("enter")
-            states.append(cur_state)
-            cur_index = len(states) - 1
-            states[cur_index].create_events()
-
-        # execute event
-        # random choose
-        for item in states[cur_index].widgets:
-            print(item)
-        random_index = random.randint(0, len(states[cur_index].events) - 1)
-        selected_event = states[cur_index].events[random_index]
+        cur_state_index = create_state()
+        # states[cur_index] represents the cur_state
+        selected_event_index = select_best_event(cur_state_index)
+        selected_event = states[cur_state_index].events[selected_event_index]
 
         event_execute(selected_event)
-
-# if __name__ == '__main__':
-#     global unique_id
-#     state_collection = []
-#     xml_file = "cur_state.xml"
-#     while true:
-#         cur_state = State()
-#         create_xml()
-#         unique_id = 1
-#         cur_widgets = getXmlData(path + xml_file)
-#         cur_state.widgets = cur_widgets
-        
-#         # judge if this state is in state_collection
-#         if (cur_state in state_collection):
-#             # do nothing
-#         else: 
-#             cur_state.create_events()
-#             state_collection.append(cur_state)
-
-#         # choose the best Q-value event
-#         max_Qvalue = 0
-#         max_index = -1
-#         for event_index in len(cur_state.events):
-#             if cur_state.events[event_index] > max_Qvalue:
-#                 max_Qvalue = cur_state.events[event_index]
-#                 max_index = event_index
-#         selected_event = cur_state.events[max_index]
-
-#         execute_event(selected_event)
-
-#         # enter new state
-#         new_state = State()
-#         create_xml()
-#         new_widgets = analyze_xml(path + xml_file)
-#         new_state.widgets = new_widgets
-#         #
-        
-#         # judge if this state is in state_collection
-#         if (cur_state in state_collection):
-#             # do nothing
-#         else: 
-#             cur_state.create_events()
-#             state_collection.append(cur_state)
+        states[cur_state_index].events[selected_event_index].visited_counter += 1
+        next_state_index = create_state()
+        discount_factors = cal_discount(len(states[next_state_index].events))
+        # enter new state
+        # Q(s, e∗) = R(e∗, s, s′) +γ · maxe∈Es′ Q(s′, e)
+        # R(e, s, s′) = 1/xe
+        new_event_index = select_best_event(next_state_index)  # event that have max Q-value
+        max_Q_value = states[next_state_index].events[new_event_index].Q_value
+        # reward + γ ×maxValue;
+        selected_Q_value = 1 / states[next_state_index].events[new_event_index].visited_counter \
+                           + discount_factors * max_Q_value
+        states[cur_state_index].events[selected_event_index].Q_value = selected_Q_value
