@@ -44,6 +44,7 @@ class State:
                 self.events.append(single_event)
                 single_event = Event("horizontal_scroll", widget_index, widgets[widget_index][3]['bounds'])
                 self.events.append(single_event)
+                self.events.append(single_event)
 
 
 def handle_bounds(bounds):
@@ -62,6 +63,7 @@ def handle_bounds(bounds):
 
 def event_execute(event):
     x1, y1, x2, y2 = handle_bounds(event.bounds)
+    print(x1,y1,x2,y2)
     x = (x1 + x2) / 2
     y = (y1 + y2) / 2
     if event.event_type == "click":
@@ -80,19 +82,19 @@ def event_execute(event):
                   " " + "500")
 
 
-def create_xml():
-    os.system("adb shell rm /sdcard/cur_state.xml")
+def create_xml(file_name):
+    os.system("adb shell rm /sdcard/" + file_name)
     # generate the xml file
-    os.system("adb shell uiautomator dump /sdcard/cur_state.xml")
+    os.system("adb shell uiautomator dump /sdcard/" + file_name)
     # pull the file to PC
-    os.system("adb pull /sdcard/cur_state.xml")
+    os.system("adb pull /sdcard/" + file_name)
 
 
 def walkData(root_node, level, required_list):
     global unique_id
     unique_id += 1
     # transverse every single node
-    children_node = root_node.getchildren()
+    children_node = list(root_node)
     if len(children_node) == 0:
         temp_list = [unique_id, level, root_node.tag, root_node.attrib]
         required_list.append(temp_list)
@@ -110,7 +112,7 @@ def get_xml_data(file_name):
     return required_list
 
 
-def judge_diff(state1, state2):
+def judge_if_same(state1, state2):
     if len(state1.widgets) == len(state2.widgets):
         for index in range(len(state1.widgets)):
             if state1.widgets[index][0] != state2.widgets[index][0] or state1.widgets[index][1] != \
@@ -121,24 +123,33 @@ def judge_diff(state1, state2):
         return False
 
 
-def create_state():
+def create_state(file_name):
     global states
     single_state = State()
-    create_xml()
-    single_state.widgets = get_xml_data("cur_state.xml")
-
+    create_xml(file_name)
+    single_state.widgets = get_xml_data(file_name)
+    for i in single_state.widgets:
+        print(i)
     # judge if cur_state is in states
-    flag = False
+    if_same_flag = False
     single_index = -1
     for state_index in range(0, len(states)):
-        if judge_diff(states[state_index], single_state):
-            flag = True
+        if judge_if_same(states[state_index], single_state):
+            if_same_flag = True
             single_index = state_index
             break
-    if not flag:
+    # print(if_same_flag)
+    if not if_same_flag:
+        print("not same state")
         states.append(single_state)
         single_index = len(states) - 1
         states[single_index].create_events()
+    else:
+        print("same state")
+        # test
+        # print("state exist")
+        # for i in states[single_index].events:
+        #     print(i.event_type)
     return single_index
 
 
@@ -162,15 +173,19 @@ def cal_discount(event_num):
 if __name__ == '__main__':
     # global states
     # current state
-    for i in range(2):
-        cur_state_index = create_state()
+    # for i in range(2):
+        unique_id = 1
+        cur_state_index = create_state("cur_state.xml")
         # states[cur_index] represents the cur_state
         selected_event_index = select_best_event(cur_state_index)
         selected_event = states[cur_state_index].events[selected_event_index]
 
         event_execute(selected_event)
+        print("event executed")
         states[cur_state_index].events[selected_event_index].visited_counter += 1
-        next_state_index = create_state()
+
+        unique_id = 1
+        next_state_index = create_state("next_state.xml")
         discount_factors = cal_discount(len(states[next_state_index].events))
         # enter new state
         # Q(s, e∗) = R(e∗, s, s′) +γ · maxe∈Es′ Q(s′, e)
