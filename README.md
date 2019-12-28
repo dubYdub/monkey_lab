@@ -9,9 +9,17 @@
 
   `adb  shell am start -n xxxxxx/xxxx`
 
+  实例：
+
+  - `adb  shell am start -n cz.martykan.forecastie/.activities.SplashActivity `
+
 - adb关闭APP
 
   `adb shell am force-stop xxxxxx`
+
+  实例：
+
+  - `adb shell am force-stop cz.martykan.forecastie`
 
 - 数据结构
 
