@@ -30,7 +30,8 @@ class State:
         widgets = self.widgets
         for widget_index in range(len(widgets)):
             if widgets[widget_index][3]['clickable'] == 'true' or widgets[widget_index][3]['focusable'] == 'true' \
-                    or widgets[widget_index][3]['checkable'] == 'true' or widgets[widget_index][3]['enabled'] == 'true':
+                    or widgets[widget_index][3]['checkable'] == 'true':
+                # or widgets[widget_index][3]['enabled'] == 'true':
                 single_event = Event("click", widget_index, widgets[widget_index][3]['bounds'])
                 self.events.append(single_event)
             if widgets[widget_index][3]['focused'] == 'true':
@@ -100,6 +101,9 @@ def walkData(root_node, level, required_list):
         required_list.append(temp_list)
         return
     for child in children_node:
+        if child.attrib["scrollable"] == "true":
+            temp_list = [unique_id, level, child.tag, child.attrib]
+            required_list.append(temp_list)
         walkData(child, level + 1, required_list)
     return
 
@@ -167,7 +171,7 @@ def select_best_event(state_index):
 
 def cal_discount(event_num):
     # 0.9 × e−0.1×(|E |−1)
-    return 0.9 * math.e ** (event_num - 1)
+    return 0.9 * math.e ** (- 0.1 * (event_num - 1))
 
 
 if __name__ == '__main__':
