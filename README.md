@@ -36,7 +36,7 @@
 1. adb shell am instrument cz.martykan.forecastie/cz.martykan.forecastie.test.JacocoInstrumentation
 2. adb pull data/data/cz.martykan.forecastie/files/coverage.ec
 3. 移动coverage.ec到/build/outputs/code-coverage/connected(如果目录不存在则手动创建)
-4. 生成代码覆盖率报告：gradle jacocoTestReport
+4. 生成代码覆盖率报告：app/Tasks/reporting/ gradle jacocoTestReport
 
 
 
