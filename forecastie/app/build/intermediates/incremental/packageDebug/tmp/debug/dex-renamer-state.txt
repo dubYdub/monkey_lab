@@ -1,4 +1,4 @@
-#Sat Dec 21 15:11:54 CST 2019
-base.0=C\:\\Users\\WZL\\CACSE\\forecastie\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out
+#Sat Dec 28 17:09:24 CST 2019
+base.0=C\:\\Users\\45751\\Desktop\\monkey_lab\\forecastie\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out
 path.0=classes.dex
 renamed.0=classes.dex

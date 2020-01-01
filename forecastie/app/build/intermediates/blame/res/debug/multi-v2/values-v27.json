@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\WZL\\CACSE\\forecastie\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v27\\values-v27.xml",
+            "outputFile": "C:\\Users\\45751\\Desktop\\monkey_lab\\forecastie\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v27\\values-v27.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\WZL\\CACSE\\forecastie\\app\\src\\main\\res\\values-v27\\styles.xml",
+                    "source": "C:\\Users\\45751\\Desktop\\monkey_lab\\forecastie\\app\\src\\main\\res\\values-v27\\styles.xml",
                     "from": {
                         "startLines": "2,11",
                         "startColumns": "4,4",

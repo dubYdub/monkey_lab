@@ -29,7 +29,8 @@
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true" >
+        android:supportsRtl="true"
+        android:testOnly="true" >
         <activity
             android:name="cz.martykan.forecastie.activities.SplashActivity"
             android:theme="@style/SplashTheme" >

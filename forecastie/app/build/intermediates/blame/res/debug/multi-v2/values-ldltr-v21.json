@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\WZL\\CACSE\\forecastie\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-ldltr-v21\\values-ldltr-v21.xml",
+            "outputFile": "C:\\Users\\45751\\Desktop\\monkey_lab\\forecastie\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-ldltr-v21\\values-ldltr-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\WZL\\.gradle\\caches\\transforms-2\\files-2.1\\c0c54f4627fbbff120cabc2dec041cc1\\res\\values-ldltr-v21\\values-ldltr-v21.xml",
+                    "source": "C:\\Users\\45751\\.gradle\\caches\\transforms-2\\files-2.1\\e79cf4a0a5cbbc0ead5d5f017d170456\\res\\values-ldltr-v21\\values-ldltr-v21.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

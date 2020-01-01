@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\WZL\\CACSE\\forecastie\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-ru\\values-ru.xml",
+            "outputFile": "C:\\Users\\45751\\Desktop\\monkey_lab\\forecastie\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-ru\\values-ru.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\WZL\\CACSE\\forecastie\\app\\src\\main\\res\\values-ru\\strings.xml",
+                    "source": "C:\\Users\\45751\\Desktop\\monkey_lab\\forecastie\\app\\src\\main\\res\\values-ru\\strings.xml",
                     "from": {
                         "startLines": "6,121,4,3,5,118,1,107,105,103,77,76,23,26,24,14,18,19,10,115,117,116,82,81,80,79,100,13,67,68,69,119,21,45,46,37,28,29,30,38,111,31,35,39,34,32,33,36,72,74,73,71,48,49,50,55,53,56,41,52,57,42,40,113,43,44,110,109,112,108,60,61,59,15,16,120,8,9,12,88,87,89,65,64,63,84,86,85,99,98,92,90,91,93,94,96,97,95",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\WZL\\.gradle\\caches\\transforms-2\\files-2.1\\c0c54f4627fbbff120cabc2dec041cc1\\res\\values-ru\\values-ru.xml",
+                    "source": "C:\\Users\\45751\\.gradle\\caches\\transforms-2\\files-2.1\\e79cf4a0a5cbbc0ead5d5f017d170456\\res\\values-ru\\values-ru.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\WZL\\.gradle\\caches\\transforms-2\\files-2.1\\2c1f4f65362cd8389f6ad7f38206689b\\res\\values-ru\\values-ru.xml",
+                    "source": "C:\\Users\\45751\\.gradle\\caches\\transforms-2\\files-2.1\\b13041712258c7f6fc488596cf5a3d23\\res\\values-ru\\values-ru.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

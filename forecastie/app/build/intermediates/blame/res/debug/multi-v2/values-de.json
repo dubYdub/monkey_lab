@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\WZL\\CACSE\\forecastie\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-de\\values-de.xml",
+            "outputFile": "C:\\Users\\45751\\Desktop\\monkey_lab\\forecastie\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-de\\values-de.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\WZL\\.gradle\\caches\\transforms-2\\files-2.1\\2c1f4f65362cd8389f6ad7f38206689b\\res\\values-de\\values-de.xml",
+                    "source": "C:\\Users\\45751\\.gradle\\caches\\transforms-2\\files-2.1\\b13041712258c7f6fc488596cf5a3d23\\res\\values-de\\values-de.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\WZL\\.gradle\\caches\\transforms-2\\files-2.1\\c0c54f4627fbbff120cabc2dec041cc1\\res\\values-de\\values-de.xml",
+                    "source": "C:\\Users\\45751\\.gradle\\caches\\transforms-2\\files-2.1\\e79cf4a0a5cbbc0ead5d5f017d170456\\res\\values-de\\values-de.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\WZL\\CACSE\\forecastie\\app\\src\\main\\res\\values-de\\strings.xml",
+                    "source": "C:\\Users\\45751\\Desktop\\monkey_lab\\forecastie\\app\\src\\main\\res\\values-de\\strings.xml",
                     "from": {
                         "startLines": "6,145,4,3,5,142,1,105,110,113,108,112,117,106,107,109,115,111,114,116,131,129,127,80,79,24,29,25,14,19,20,10,27,139,141,140,85,84,83,82,103,13,70,71,72,143,22,51,52,41,31,32,33,42,135,34,38,43,37,35,36,39,75,77,76,74,40,47,57,55,48,58,45,54,59,46,44,137,49,50,134,133,136,132,64,62,63,61,15,16,144,8,9,122,121,120,123,119,124,17,91,90,92,68,67,66,87,89,88,102,101,95,93,94,96,97,99,100,98,12",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
